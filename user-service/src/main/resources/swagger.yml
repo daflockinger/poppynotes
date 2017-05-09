@@ -1,0 +1,491 @@
+swagger: '2.0'
+info:
+  title: PoppyNotes User API
+  description: PoppyNotes User auth/management API
+  version: "1.0.0"
+# array of all schemes that your API supportsf
+schemes:
+  - https
+# will be prefixed to all paths
+basePath: /api/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+parameters:
+  IdUser:
+    name: userId
+    in: path
+    description: Unique identifier of a User;
+    required: true
+    type: integer
+    format: int64
+  UserCreate:
+    name: user-create
+    in: body
+    schema:
+      $ref: '#/definitions/CreateUser'
+    required: true  
+  UserUpdate:
+    name: user-update
+    in: body
+    schema:
+      $ref: '#/definitions/UpdateUser'
+    required: true
+  UserAuth:
+    name: user-auth
+    in: body
+    schema:
+      $ref: '#/definitions/AuthUser'
+  PinSend:
+    name: pin-send
+    in: body
+    schema:
+      $ref: '#/definitions/SendPin'
+  PinCreate:
+    name: pin-create
+    in: body
+    schema:
+      $ref: '#/definitions/CreatePin'
+  UserUnlock:
+    name: user-unlock
+    in: body
+    schema: 
+      $ref: '#/definitions/Unlock'
+paths:
+  /api/v1/users:
+    post:
+      summary: Create User
+      description: Creates new User entry.
+      parameters:
+        - $ref: '#/parameters/UserCreate'
+      tags: 
+        - Users
+      responses:
+        201:
+          description: Created User.
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
+    put:
+      summary: Update User
+      description: Updated a User entry.
+      parameters:
+        - $ref: '#/parameters/UserUpdate'
+      tags: 
+        - Users
+      responses:
+        200:
+          description: User updated.
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
+  /api/v1/users/{userId}:
+    get:
+      summary: Get User
+      description: Fetches User with defined Id.
+      parameters:
+        - $ref: '#/parameters/IdUser'
+      tags: 
+        - Users
+      responses:
+        200:
+          description: User entity.
+          schema:
+            $ref: '#/definitions/ShowUser'
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
+    delete:
+      summary: Delete User
+      description: Deletes a User with defined Id.
+      parameters:
+        - $ref: '#/parameters/IdUser'
+      tags: 
+        - Users
+      responses:
+        200:
+          description: User deleted.
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
+  /api/v1/users/auth:
+    post:
+      summary: Check if user exists
+      description: Checkes if user exists and returns info if so.
+      parameters:
+        - $ref: '#/parameters/UserAuth'
+      tags: 
+        - Users
+      responses:
+        200:
+          description: User info.
+          schema:
+            $ref: '#/definitions/ShowUser'
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
+  /api/v1/users/pin:
+    post:
+      summary:  Creates a new Pin
+      description: Creates a new Pin code for the user.
+      parameters:
+        - $ref: '#/parameters/PinCreate'
+      tags: 
+        - Users
+      responses:
+        201:
+          description: Pin created.
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
+  /api/v1/users/pin/{userId}:
+    delete:
+      summary:  Deletes a Pin
+      description: Removes a Pin code.
+      parameters:
+        - $ref: '#/parameters/IdUser'
+      tags: 
+        - Users
+      responses:
+        201:
+          description: Pin removed.
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
+  /api/v1/users/pin/check:
+    post:
+      summary: Checks pin of user
+      description: Fetches User info with defined Id.
+      parameters:
+        - $ref: '#/parameters/PinSend'
+      tags: 
+        - Users
+      responses:
+        200:
+          description: Sent Pin is correct.
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
+  /api/v1/users/unlock:
+    post:
+      summary: Unlocks user
+      description: Unlocks a locked user with code
+      parameters:
+        - $ref: '#/parameters/UserUnlock'
+      tags: 
+        - Users
+      responses:
+        200:
+          description: User unlocked.
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
+  /api/v1/users/lock/{userId}:
+    post:
+      summary: Locks user
+      description: Locks a user and sends unlock email.
+      parameters:
+        - $ref: '#/parameters/IdUser'
+      tags: 
+        - Users
+      responses:
+        200:
+          description: User locked.
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
+definitions:
+  CreateUser:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Display name.
+      authEmail:
+        type: string
+        description: Hash of authorization email used in SSO
+      recoveryEmail:
+        type: string
+        description: Email for Two-factor authorization.
+      status:
+        type: string
+        enum:
+          - ACTIVE
+          - DISABLED
+          - STRIKE_ONE
+          - STRIKE_TWO
+          - LOCKED
+        description: Status of the User.
+      roles:
+        type: array
+        items:
+          type: string
+          description: Role of a User (authorized to to specific stuff).
+          enum:
+            - AUTHOR
+            - ADMIN
+      cryptKey:
+        type: string
+        description: Key for message encryption, should be manually & random created and very long.
+  UpdateUser:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: Unique Identifier of the User.
+      name:
+        type: string
+        description: Display name.
+      authEmail:
+        type: string
+        description: Hash of authorization email used in SSO
+      recoveryEmail:
+        type: string
+        description: Email for Two-factor authorization.
+      status:
+        type: string
+        enum:
+          - ACTIVE
+          - DISABLED
+          - STRIKE_ONE
+          - STRIKE_TWO
+          - LOCKED
+        description: Status of the User.
+      roles:
+        type: array
+        items:
+          type: string
+          description: Role of a User (authorized to to specific stuff).
+          enum:
+            - AUTHOR
+            - ADMIN
+  ShowUser:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Display name.
+      recoveryEmail:
+        type: string
+        description: Email for Two-factor authorization.
+      status:
+        type: string
+        enum:
+          - ACTIVE
+          - DISABLED
+          - STRIKE_ONE
+          - STRIKE_TWO
+          - LOCKED
+        description: Status of the User.
+      roles:
+        type: array
+        items:
+          type: string
+          description: Role of a User (authorized to to specific stuff).
+          enum:
+            - AUTHOR
+            - ADMIN
+  AuthUser:
+    type: object
+    properties:
+      authEmail:
+        type: string
+        description: Hash of authorization email.
+  CreatePin:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: Unique Identifier of the User.
+      pin:
+        type: string
+        description: Pin code accessing/editing notes (Third-factor).
+      recoveryEmail:
+        type: string
+        description: Email for Two-factor authorization.
+  SendPin:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: Unique Identifier of the User.
+      pin:
+        type: string
+        description: Pin code accessing/editing notes (Third-factor).
+  Unlock:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: Unique Identifier of the User.
+      unlockCode:
+        type: string
+        description: Code to unlock the locked account (what the name says).
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: object
+        description: Invalid fields.
+        additionalProperties:
+          type: string
