@@ -1,0 +1,28 @@
+Simple Note program:
+
+
+Messages are transfered to the backend unencrypted through HTTPS. 
+They are catched ASAP from a Filter in the backend an beeing encrypted, 
+with the help of a key file on the local server and with 
+some credentials in the /userinfo endpoint of Google (e.g. email address).
+
+Its stored on MongoDB, all reactive:
+- reactive MongoDB driver
+- RxJava (Single, Observable)
+- Async Server
+- Pub/Sub based
+- Angular 2 reactive frontend
+
+
+Basic 3-factor Authorization:
+1. Google OpenID-Connect
+2. 4-5 digit random code sent to ANOTHER email address
+3. answer a randomly picked question out of 5/10 (self defined)
+(alternative for 3. would be the PIN code)
+
+
+Inside security:
+Whenever a note is create/edited/deleted a PIN code will be requested, 
+only on right input any information will be altered. 
+If entered wrong, the user will be logged out (maybe also locked for some time).
+
