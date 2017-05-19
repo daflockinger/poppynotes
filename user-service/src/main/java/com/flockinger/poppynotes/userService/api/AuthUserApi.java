@@ -8,16 +8,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.flockinger.poppynotes.userService.dto.AuthUser;
+import com.flockinger.poppynotes.userService.dto.CheckPinResult;
 import com.flockinger.poppynotes.userService.dto.CreatePin;
 import com.flockinger.poppynotes.userService.dto.Error;
 import com.flockinger.poppynotes.userService.dto.SendPin;
 import com.flockinger.poppynotes.userService.dto.ShowUser;
 import com.flockinger.poppynotes.userService.dto.Unlock;
+import com.flockinger.poppynotes.userService.dto.UnlockResult;
 import com.flockinger.poppynotes.userService.exception.DtoValidationFailedException;
 import com.flockinger.poppynotes.userService.exception.InvalidEmailServerConfigurationException;
 import com.flockinger.poppynotes.userService.exception.PinAlreadyExistingException;
 import com.flockinger.poppynotes.userService.exception.UserNotFoundException;
-import com.flockinger.poppynotes.userService.exception.WrongUnlockCodeException;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -42,7 +43,7 @@ public interface AuthUserApi {
 
 	@ApiOperation(value = "Checks pin of user", notes = "Fetches User info with defined Id.", response = Void.class, tags = {
 			"Users", })
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Sent Pin is correct.", response = Void.class),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Sent Pin is correct.", response = CheckPinResult.class),
 			@ApiResponse(code = 400, message = "Bad request (validation failed).", response = Error.class),
 			@ApiResponse(code = 401, message = "Unauthorized (need to log in / get token).", response = Void.class),
 			@ApiResponse(code = 403, message = "Forbidden (no rights to access resource).", response = Void.class),
@@ -51,7 +52,7 @@ public interface AuthUserApi {
 			@ApiResponse(code = 500, message = "Internal Server Error.", response = Void.class) })
 	@RequestMapping(value = "/api/v1/users/pin/check", produces = { "application/json" }, consumes = {
 			"application/json" }, method = RequestMethod.POST)
-	ResponseEntity<Void> apiV1UsersPinCheckPost(@ApiParam(value = "") @RequestBody SendPin pinSend,
+	ResponseEntity<CheckPinResult> apiV1UsersPinCheckPost(@ApiParam(value = ""  ) @RequestBody SendPin pinSend,
 			BindingResult bindingResult)
 			throws DtoValidationFailedException, UserNotFoundException, InvalidEmailServerConfigurationException;
 
@@ -86,7 +87,7 @@ public interface AuthUserApi {
 
 	@ApiOperation(value = "Unlocks user", notes = "Unlocks a locked user with code", response = Void.class, tags = {
 			"Users", })
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "User unlocked.", response = Void.class),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "User unlocked.", response = UnlockResult.class),
 			@ApiResponse(code = 400, message = "Bad request (validation failed).", response = Error.class),
 			@ApiResponse(code = 401, message = "Unauthorized (need to log in / get token).", response = Void.class),
 			@ApiResponse(code = 403, message = "Forbidden (no rights to access resource).", response = Void.class),
@@ -95,9 +96,9 @@ public interface AuthUserApi {
 			@ApiResponse(code = 500, message = "Internal Server Error.", response = Void.class) })
 	@RequestMapping(value = "/api/v1/users/unlock", produces = { "application/json" }, consumes = {
 			"application/json" }, method = RequestMethod.POST)
-	ResponseEntity<Void> apiV1UsersUnlockPost(@ApiParam(value = "") @RequestBody Unlock userUnlock,
+	ResponseEntity<UnlockResult> apiV1UsersUnlockPost(@ApiParam(value = ""  ) @RequestBody Unlock userUnlock,
 			BindingResult bindingResult)
-			throws DtoValidationFailedException, UserNotFoundException, WrongUnlockCodeException;
+			throws DtoValidationFailedException, UserNotFoundException;
 
 	@ApiOperation(value = "Locks user", notes = "Locks a user and sends unlock email.", response = Void.class, tags = {
 			"Users", })

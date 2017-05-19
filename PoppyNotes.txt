@@ -1,5 +1,7 @@
 Simple Note program:
 
+!!!! use this as reverse proxy for docker cluster: https://github.com/containous/traefik
+
 
 Messages are transfered to the backend unencrypted through HTTPS. 
 They are catched ASAP from a Filter in the backend an beeing encrypted, 

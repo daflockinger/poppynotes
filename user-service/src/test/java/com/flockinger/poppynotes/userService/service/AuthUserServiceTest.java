@@ -27,10 +27,10 @@ import com.flockinger.poppynotes.userService.dto.SendPin;
 import com.flockinger.poppynotes.userService.dto.ShowUser;
 import com.flockinger.poppynotes.userService.dto.StatusEnum;
 import com.flockinger.poppynotes.userService.dto.Unlock;
+import com.flockinger.poppynotes.userService.dto.UnlockResult;
 import com.flockinger.poppynotes.userService.exception.InvalidEmailServerConfigurationException;
 import com.flockinger.poppynotes.userService.exception.PinAlreadyExistingException;
 import com.flockinger.poppynotes.userService.exception.UserNotFoundException;
-import com.flockinger.poppynotes.userService.exception.WrongUnlockCodeException;
 import com.flockinger.poppynotes.userService.model.User;
 import com.flockinger.poppynotes.userService.model.UserStatus;
 
@@ -81,7 +81,7 @@ public class AuthUserServiceTest extends BaseServiceTest {
 		pin.setId(2l);
 		pin.setPin("4321");
 
-		assertTrue(service.checkPin(pin));
+		assertTrue(service.checkPin(pin).getValid());
 	}
 
 	@Test
@@ -92,7 +92,7 @@ public class AuthUserServiceTest extends BaseServiceTest {
 		pin.setId(2l);
 		pin.setPin("0000");
 
-		assertFalse(service.checkPin(pin));
+		assertFalse(service.checkPin(pin).getValid());
 	}
 
 	@Test(expected = UserNotFoundException.class)
@@ -216,32 +216,34 @@ public class AuthUserServiceTest extends BaseServiceTest {
 	@Test
 	@FlywayTest(locationsForMigrate = { "/db/test" })
 	public void testUnlockUser_withCorrectPinAndUser_shouldWork()
-			throws UserNotFoundException, WrongUnlockCodeException {
+			throws UserNotFoundException {
 		assertEquals("is user locked before", UserStatus.LOCKED, dao.findOne(4l).getStatus());
 
 		Unlock unlock = new Unlock();
 		unlock.setId(4l);
 		unlock.setUnlockCode("s887q");
 
-		service.unlockUser(unlock);
+		UnlockResult result = service.unlockUser(unlock);
+		assertTrue(result.getIsUnlocked());
 
 		assertEquals("is user locked before", UserStatus.ACTIVE, dao.findOne(4l).getStatus());
 	}
 
-	@Test(expected = WrongUnlockCodeException.class)
+	@Test
 	@FlywayTest(locationsForMigrate = { "/db/test" })
 	public void testUnlockUser_withWrongPin_shouldThrowException()
-			throws UserNotFoundException, WrongUnlockCodeException {
+			throws UserNotFoundException {
 		Unlock unlock = new Unlock();
 		unlock.setId(4l);
 		unlock.setUnlockCode("0000");
-
-		service.unlockUser(unlock);
+		
+		UnlockResult result = service.unlockUser(unlock);
+		assertFalse("user is not unlocked, code wrong", result.getIsUnlocked());
 	}
 
 	@Test(expected = UserNotFoundException.class)
 	public void testUnlockUser_withWrongUser_shouldThrowException()
-			throws UserNotFoundException, WrongUnlockCodeException {
+			throws UserNotFoundException {
 		Unlock unlock = new Unlock();
 		unlock.setId(76575l);
 		unlock.setUnlockCode("s887q");

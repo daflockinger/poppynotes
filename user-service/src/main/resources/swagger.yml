@@ -269,6 +269,8 @@ paths:
       responses:
         200:
           description: Sent Pin is correct.
+          schema:
+            $ref: '#/definitions/CheckPinResult'
         400:
           description: Bad request (validation failed).
           schema:
@@ -298,6 +300,8 @@ paths:
       responses:
         200:
           description: User unlocked.
+          schema:
+            $ref: '#/definitions/UnlockResult'
         400:
           description: Bad request (validation failed).
           schema:
@@ -466,6 +470,18 @@ definitions:
       pin:
         type: string
         description: Pin code accessing/editing notes (Third-factor).
+  CheckPinResult:
+    type: object
+    properties:
+      valid:
+        type: boolean
+        description: Returns true if sent PIN code is valid (correct).
+  UnlockResult:
+    type: object
+    properties:
+      isUnlocked:
+        type: boolean
+        description: Returns true if sent unlock code is valid (correct) and user is unlocked.
   Unlock:
     type: object
     properties:

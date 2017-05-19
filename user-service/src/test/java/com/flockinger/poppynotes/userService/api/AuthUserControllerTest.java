@@ -61,13 +61,14 @@ public class AuthUserControllerTest extends BaseControllerTest {
 	@Test
 	@FlywayTest(locationsForMigrate = { "/db/test" })
 	@Transactional
-	public void testApiV1UsersPinCheckPost_withValidPin_shouldReturnOk() throws Exception {
+	public void testApiV1UsersPinCheckPost_withValidPin_shouldReturnValid() throws Exception {
 		SendPin pin = new SendPin();
 		pin.setId(2l);
 		pin.setPin("4321");
 		
 		mockMvc.perform(post("/api/v1/users/pin/check").content(json(pin))
 					.contentType(jsonContentType))
+					.andExpect(jsonPath("$.valid", is(true)))
 					.andExpect(status().isOk());
 		
 		assertEquals("should still be status active",UserStatus.ACTIVE,dao.getOne(2l).getStatus());
@@ -82,7 +83,8 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		
 		mockMvc.perform(post("/api/v1/users/pin/check").content(json(pin))
 					.contentType(jsonContentType))
-					.andExpect(status().isForbidden());
+					.andExpect(jsonPath("$.valid", is(false)))
+					.andExpect(status().isOk());
 	}
 
 	@Test
@@ -130,15 +132,18 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		
 		mockMvc.perform(post("/api/v1/users/pin/check").content(json(pin))
 					.contentType(jsonContentType))
-					.andExpect(status().isForbidden());
+					.andExpect(jsonPath("$.valid", is(false)))
+					.andExpect(status().isOk());
 		
 		mockMvc.perform(post("/api/v1/users/pin/check").content(json(pin))
-				.contentType(jsonContentType))
-				.andExpect(status().isForbidden());
+					.contentType(jsonContentType))
+					.andExpect(jsonPath("$.valid", is(false)))
+					.andExpect(status().isOk());
 		
 		mockMvc.perform(post("/api/v1/users/pin/check").content(json(pin))
-				.contentType(jsonContentType))
-				.andExpect(status().isForbidden());
+					.contentType(jsonContentType))
+					.andExpect(jsonPath("$.valid", is(false)))
+					.andExpect(status().isOk());
 		
 		assertEquals("after three times should be locked",UserStatus.LOCKED,dao.getOne(2l).getStatus());
 	}
@@ -263,6 +268,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		
 		mockMvc.perform(post("/api/v1/users/unlock").content(json(unlock))
 				.contentType(jsonContentType))
+				.andExpect(jsonPath("$.isUnlocked", is(true)))
 				.andExpect(status().isOk());
 	}
 	
@@ -299,7 +305,8 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		
 		mockMvc.perform(post("/api/v1/users/unlock").content(json(unlock))
 				.contentType(jsonContentType))
-				.andExpect(status().isForbidden());
+				.andExpect(jsonPath("$.isUnlocked", is(false)))
+				.andExpect(status().isOk());
 	}
 	
 	@Test

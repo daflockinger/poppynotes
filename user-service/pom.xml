@@ -125,7 +125,7 @@
 				<version>2.2.2</version> <executions> <execution> <goals> <goal>generate</goal> 
 				</goals> <configuration> <inputSpec>src/main/resources/swagger.yml</inputSpec> 
 				<language>spring</language> <configOptions> <sourceFolder>/cgen/java/main</sourceFolder> 
-				</configOptions> </configuration> </execution> </executions> </plugin> -->
+				</configOptions> </configuration> </execution> </executions> </plugin>  -->		
 		</plugins>
 	</build>
 
