@@ -36,7 +36,7 @@ public interface AuthUserApi {
 			@ApiResponse(code = 404, message = "Entity not found.", response = Error.class),
 			@ApiResponse(code = 409, message = "Request results in a conflict.", response = Error.class),
 			@ApiResponse(code = 500, message = "Internal Server Error.", response = Void.class) })
-	@RequestMapping(value = "/api/v1/users/auth", produces = { "application/json" }, consumes = {
+	@RequestMapping(value = "/api/v1/user-checks/auth", produces = { "application/json" }, consumes = {
 			"application/json" }, method = RequestMethod.POST)
 	ResponseEntity<ShowUser> apiV1UsersAuthPost(@ApiParam(value = "") @RequestBody AuthUser userAuth,
 			BindingResult bindingResult) throws DtoValidationFailedException, UserNotFoundException;
@@ -50,7 +50,7 @@ public interface AuthUserApi {
 			@ApiResponse(code = 404, message = "Entity not found.", response = Error.class),
 			@ApiResponse(code = 409, message = "Request results in a conflict.", response = Error.class),
 			@ApiResponse(code = 500, message = "Internal Server Error.", response = Void.class) })
-	@RequestMapping(value = "/api/v1/users/pin/check", produces = { "application/json" }, consumes = {
+	@RequestMapping(value = "/api/v1/user-checks/pin/check", produces = { "application/json" }, consumes = {
 			"application/json" }, method = RequestMethod.POST)
 	ResponseEntity<CheckPinResult> apiV1UsersPinCheckPost(@ApiParam(value = ""  ) @RequestBody SendPin pinSend,
 			BindingResult bindingResult)
@@ -65,7 +65,7 @@ public interface AuthUserApi {
 			@ApiResponse(code = 404, message = "Entity not found.", response = Error.class),
 			@ApiResponse(code = 409, message = "Request results in a conflict.", response = Error.class),
 			@ApiResponse(code = 500, message = "Internal Server Error.", response = Void.class) })
-	@RequestMapping(value = "/api/v1/users/pin", produces = { "application/json" }, consumes = {
+	@RequestMapping(value = "/api/v1/user-checks/pin", produces = { "application/json" }, consumes = {
 			"application/json" }, method = RequestMethod.POST)
 	ResponseEntity<Void> apiV1UsersPinPost(@ApiParam(value = "") @RequestBody CreatePin pinCreate,
 			BindingResult bindingResult)
@@ -79,7 +79,7 @@ public interface AuthUserApi {
 			@ApiResponse(code = 404, message = "Entity not found.", response = Error.class),
 			@ApiResponse(code = 409, message = "Request results in a conflict.", response = Error.class),
 			@ApiResponse(code = 500, message = "Internal Server Error.", response = Void.class) })
-	@RequestMapping(value = "/api/v1/users/pin/{userId}", produces = { "application/json" }, consumes = {
+	@RequestMapping(value = "/api/v1/user-checks/pin/{userId}", produces = { "application/json" }, consumes = {
 			"application/json" }, method = RequestMethod.DELETE)
 	ResponseEntity<Void> apiV1UsersPinUserIdDelete(
 			@ApiParam(value = "Unique identifier of a User;", required = true) @PathVariable("userId") Long userId)
@@ -94,7 +94,7 @@ public interface AuthUserApi {
 			@ApiResponse(code = 404, message = "Entity not found.", response = Error.class),
 			@ApiResponse(code = 409, message = "Request results in a conflict.", response = Error.class),
 			@ApiResponse(code = 500, message = "Internal Server Error.", response = Void.class) })
-	@RequestMapping(value = "/api/v1/users/unlock", produces = { "application/json" }, consumes = {
+	@RequestMapping(value = "/api/v1/user-checks/unlock", produces = { "application/json" }, consumes = {
 			"application/json" }, method = RequestMethod.POST)
 	ResponseEntity<UnlockResult> apiV1UsersUnlockPost(@ApiParam(value = ""  ) @RequestBody Unlock userUnlock,
 			BindingResult bindingResult)
@@ -109,7 +109,7 @@ public interface AuthUserApi {
 			@ApiResponse(code = 404, message = "Entity not found.", response = Void.class),
 			@ApiResponse(code = 409, message = "Request results in a conflict.", response = Void.class),
 			@ApiResponse(code = 500, message = "Internal Server Error.", response = Void.class) })
-	@RequestMapping(value = "/api/v1/users/lock/{userId}", produces = { "application/json" }, consumes = {
+	@RequestMapping(value = "/api/v1/user-checks/lock/{userId}", produces = { "application/json" }, consumes = {
 			"application/json" }, method = RequestMethod.POST)
 	ResponseEntity<Void> apiV1UsersLockUserIdPost(
 			@ApiParam(value = "Unique identifier of a User;", required = true) @PathVariable("userId") Long userId)

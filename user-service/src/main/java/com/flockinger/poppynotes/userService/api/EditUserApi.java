@@ -83,8 +83,7 @@ public interface EditUserApi {
         @ApiResponse(code = 409, message = "Request results in a conflict.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Void.class) })
     @RequestMapping(value = "/api/v1/users/{userId}",
-        produces = { "application/json" }, 
-        consumes = { "application/json" },
+        produces = { "application/json" },
         method = RequestMethod.GET)
     ResponseEntity<ShowUser> apiV1UsersUserIdGet(@ApiParam(value = "Unique identifier of a User;",required=true ) @PathVariable("userId") Long userId) throws UserNotFoundException;
 }
