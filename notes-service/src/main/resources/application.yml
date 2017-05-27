@@ -3,12 +3,21 @@ server:
   
 spring:
   data:
-    cassandra:
-      contact-points: 127.0.0.1
-      port: 9042
-      keyspace-name: poppynotes
-      schema-action: CREATE_IF_NOT_EXISTS
-
+    mongodb:
+      host: localhost
+      port: 27017
+      database: poppynotes
+  jackson:
+    date-format: com.flockinger.poppynotes.notesService.config.RFC3339DateFormat
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+    
+springfox:
+  documentation:
+    swagger:
+      v2:
+        path: /api-docs
+        
 eureka:
   client:
     serviceUrl:
@@ -23,3 +32,14 @@ endpoints:
 management:
   security:
     enabled: false
+    
+    
+#### Test Profile
+---
+spring: 
+  profiles: test
+  data:
+    mongodb:
+      host: localhost
+      port: 27117
+      database: poppynotes

@@ -1,51 +1,50 @@
 package com.flockinger.poppynotes.notesService.model;
 
 import java.util.Date;
-import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
-import org.springframework.cassandra.core.Ordering;
-import org.springframework.cassandra.core.PrimaryKeyType;
-import org.springframework.data.cassandra.mapping.CassandraType;
-import org.springframework.data.cassandra.mapping.Column;
-import org.springframework.data.cassandra.mapping.PrimaryKeyColumn;
-import org.springframework.data.cassandra.mapping.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.datastax.driver.core.DataType.Name;
-
-@Table
+@Document(collection="note")
+@CompoundIndexes(value={
+		@CompoundIndex(name="lastedit_user_idx",def="{'lastEdit': -1, 'userId' : 1}"),
+		@CompoundIndex(name="user_pinned_idx",def="{'userId' : 1, 'pinned' : -1}"),
+		@CompoundIndex(name="lastedit_user_pin_idx",def="{'lastEdit': -1, 'userId' : 1, 'pinned' : -1}")
+})
 public class Note {
 
-	@PrimaryKeyColumn(name = "note_id", ordinal = 0, type = PrimaryKeyType.PARTITIONED)
-	@CassandraType(type=Name.UUID)
-	private UUID id;
+	@NotNull
+	@Id
+	private String id;
 	
 	@NotNull
-	@PrimaryKeyColumn(name = "user_id", ordinal = 1, type = PrimaryKeyType.PARTITIONED)
+	@Indexed
 	private Long userId;
 
 	@NotNull
-	@PrimaryKeyColumn(name = "is_pinned", ordinal = 2, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
 	private Boolean pinned;
 	
 	@NotNull
-	@PrimaryKeyColumn(name = "last_edit_time_stamp", ordinal = 3, type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING)
+	@Indexed
 	private Date lastEdit;
 
 	@NotNull
-	@Column
 	private String title;
 
-	@Column
+	
 	private String content;
 	
 	
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(UUID id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
