@@ -169,7 +169,7 @@ paths:
             $ref: '#/definitions/Error'
         500:
           description: Internal Server Error.
-  /api/v1/users/auth:
+  /api/v1/user-checks/auth:
     post:
       summary: Check if user exists
       description: Checkes if user exists and returns info if so.
@@ -200,7 +200,7 @@ paths:
             $ref: '#/definitions/Error'
         500:
           description: Internal Server Error.
-  /api/v1/users/pin:
+  /api/v1/user-checks/pin:
     post:
       summary:  Creates a new Pin
       description: Creates a new Pin code for the user.
@@ -229,7 +229,7 @@ paths:
             $ref: '#/definitions/Error'
         500:
           description: Internal Server Error.
-  /api/v1/users/pin/{userId}:
+  /api/v1/user-checks/pin/{userId}:
     delete:
       summary:  Deletes a Pin
       description: Removes a Pin code.
@@ -258,7 +258,7 @@ paths:
             $ref: '#/definitions/Error'
         500:
           description: Internal Server Error.
-  /api/v1/users/pin/check:
+  /api/v1/user-checks/pin/check:
     post:
       summary: Checks pin of user
       description: Fetches User info with defined Id.
@@ -269,6 +269,8 @@ paths:
       responses:
         200:
           description: Sent Pin is correct.
+          schema:
+            $ref: '#/definitions/CheckPinResult'
         400:
           description: Bad request (validation failed).
           schema:
@@ -287,7 +289,7 @@ paths:
             $ref: '#/definitions/Error'
         500:
           description: Internal Server Error.
-  /api/v1/users/unlock:
+  /api/v1/user-checks/unlock:
     post:
       summary: Unlocks user
       description: Unlocks a locked user with code
@@ -298,6 +300,8 @@ paths:
       responses:
         200:
           description: User unlocked.
+          schema:
+            $ref: '#/definitions/UnlockResult'
         400:
           description: Bad request (validation failed).
           schema:
@@ -316,7 +320,7 @@ paths:
             $ref: '#/definitions/Error'
         500:
           description: Internal Server Error.
-  /api/v1/users/lock/{userId}:
+  /api/v1/user-checks/lock/{userId}:
     post:
       summary: Locks user
       description: Locks a user and sends unlock email.
@@ -466,6 +470,18 @@ definitions:
       pin:
         type: string
         description: Pin code accessing/editing notes (Third-factor).
+  CheckPinResult:
+    type: object
+    properties:
+      valid:
+        type: boolean
+        description: Returns true if sent PIN code is valid (correct).
+  UnlockResult:
+    type: object
+    properties:
+      isUnlocked:
+        type: boolean
+        description: Returns true if sent unlock code is valid (correct) and user is unlocked.
   Unlock:
     type: object
     properties:

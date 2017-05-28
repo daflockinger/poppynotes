@@ -9,14 +9,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.flockinger.poppynotes.userService.dao.UserRepository;
 import com.flockinger.poppynotes.userService.dto.AuthUser;
+import com.flockinger.poppynotes.userService.dto.CheckPinResult;
 import com.flockinger.poppynotes.userService.dto.CreatePin;
 import com.flockinger.poppynotes.userService.dto.SendPin;
 import com.flockinger.poppynotes.userService.dto.ShowUser;
 import com.flockinger.poppynotes.userService.dto.Unlock;
+import com.flockinger.poppynotes.userService.dto.UnlockResult;
 import com.flockinger.poppynotes.userService.exception.InvalidEmailServerConfigurationException;
 import com.flockinger.poppynotes.userService.exception.PinAlreadyExistingException;
 import com.flockinger.poppynotes.userService.exception.UserNotFoundException;
-import com.flockinger.poppynotes.userService.exception.WrongUnlockCodeException;
 import com.flockinger.poppynotes.userService.model.User;
 import com.flockinger.poppynotes.userService.model.UserStatus;
 import com.flockinger.poppynotes.userService.service.AuthUserService;
@@ -47,15 +48,16 @@ public class AuthUserServiceImpl implements AuthUserService {
 
 	@Override
 	@Transactional
-	public boolean checkPin(SendPin pin) throws UserNotFoundException, InvalidEmailServerConfigurationException {
+	public CheckPinResult checkPin(SendPin pin) throws UserNotFoundException, InvalidEmailServerConfigurationException {
 		User user = assertAndReturnUserById(pin.getId());
+		CheckPinResult checkResult = new CheckPinResult();
+		checkResult.setValid(true);
 
-		if (StringUtils.equals(pin.getPin(), user.getPinCode())) {
-			return true;
-		} else {
+		if (!StringUtils.equals(pin.getPin(), user.getPinCode())) {
 			applyStrike(user);
-			return false;
+			checkResult.setValid(false);
 		}
+		return checkResult;
 	}
 
 	private User assertAndReturnUserById(Long userId) throws UserNotFoundException {
@@ -118,15 +120,17 @@ public class AuthUserServiceImpl implements AuthUserService {
 
 	@Override
 	@Transactional
-	public void unlockUser(Unlock unlock) throws UserNotFoundException, WrongUnlockCodeException {
+	public UnlockResult unlockUser(Unlock unlock) throws UserNotFoundException {
 		User user = assertAndReturnUserById(unlock.getId());
+		UnlockResult unlockResult = new UnlockResult();
+		unlockResult.setIsUnlocked(false);
 
 		if (StringUtils.equals(unlock.getUnlockCode(), user.getUnlockCode())) {
 			user.setUnlockCode(null);
 			saveStatus(user, UserStatus.ACTIVE);
-		} else {
-			throw new WrongUnlockCodeException("Wrong Unlock Code Entered");
-		}
+			unlockResult.setIsUnlocked(true);
+		} 
+		return unlockResult;
 	}
 
 	@Override

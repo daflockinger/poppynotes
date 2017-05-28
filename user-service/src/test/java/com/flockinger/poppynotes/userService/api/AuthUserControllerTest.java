@@ -41,7 +41,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		AuthUser auth = new AuthUser();
 		auth.setAuthEmail("sep@gmail.com")
 		;
-		mockMvc.perform(post("/api/v1/users/auth").content(json(auth)).contentType(jsonContentType))
+		mockMvc.perform(post("/api/v1/user-checks/auth").content(json(auth)).contentType(jsonContentType))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.name", is("sepp")))
 				.andExpect(jsonPath("$.recoveryEmail", is("sep@gmx.net")))
@@ -54,20 +54,21 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		AuthUser auth = new AuthUser();
 		auth.setAuthEmail("hacker@gmail.com");
 
-		mockMvc.perform(post("/api/v1/users/auth").content(json(auth)).contentType(jsonContentType))
+		mockMvc.perform(post("/api/v1/user-checks/auth").content(json(auth)).contentType(jsonContentType))
 				.andExpect(status().isNotFound());
 	}
 
 	@Test
 	@FlywayTest(locationsForMigrate = { "/db/test" })
 	@Transactional
-	public void testApiV1UsersPinCheckPost_withValidPin_shouldReturnOk() throws Exception {
+	public void testApiV1UsersPinCheckPost_withValidPin_shouldReturnValid() throws Exception {
 		SendPin pin = new SendPin();
 		pin.setId(2l);
 		pin.setPin("4321");
 		
-		mockMvc.perform(post("/api/v1/users/pin/check").content(json(pin))
+		mockMvc.perform(post("/api/v1/user-checks/pin/check").content(json(pin))
 					.contentType(jsonContentType))
+					.andExpect(jsonPath("$.valid", is(true)))
 					.andExpect(status().isOk());
 		
 		assertEquals("should still be status active",UserStatus.ACTIVE,dao.getOne(2l).getStatus());
@@ -80,9 +81,10 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		pin.setId(2l);
 		pin.setPin("1234");
 		
-		mockMvc.perform(post("/api/v1/users/pin/check").content(json(pin))
+		mockMvc.perform(post("/api/v1/user-checks/pin/check").content(json(pin))
 					.contentType(jsonContentType))
-					.andExpect(status().isForbidden());
+					.andExpect(jsonPath("$.valid", is(false)))
+					.andExpect(status().isOk());
 	}
 
 	@Test
@@ -91,7 +93,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		pin.setId(26577l);
 		pin.setPin("4321");
 		
-		mockMvc.perform(post("/api/v1/users/pin/check").content(json(pin))
+		mockMvc.perform(post("/api/v1/user-checks/pin/check").content(json(pin))
 					.contentType(jsonContentType))
 					.andExpect(status().isNotFound());
 	}
@@ -102,7 +104,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		pin.setId(null);
 		pin.setPin("4321");
 		
-		mockMvc.perform(post("/api/v1/users/pin/check").content(json(pin))
+		mockMvc.perform(post("/api/v1/user-checks/pin/check").content(json(pin))
 					.contentType(jsonContentType))
 					.andExpect(status().isBadRequest());
 	}
@@ -113,7 +115,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		pin.setId(2l);
 		pin.setPin("");
 		
-		mockMvc.perform(post("/api/v1/users/pin/check").content(json(pin))
+		mockMvc.perform(post("/api/v1/user-checks/pin/check").content(json(pin))
 					.contentType(jsonContentType))
 					.andExpect(status().isBadRequest());
 	}
@@ -128,17 +130,20 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		pin.setId(2l);
 		pin.setPin("0000");
 		
-		mockMvc.perform(post("/api/v1/users/pin/check").content(json(pin))
+		mockMvc.perform(post("/api/v1/user-checks/pin/check").content(json(pin))
 					.contentType(jsonContentType))
-					.andExpect(status().isForbidden());
+					.andExpect(jsonPath("$.valid", is(false)))
+					.andExpect(status().isOk());
 		
-		mockMvc.perform(post("/api/v1/users/pin/check").content(json(pin))
-				.contentType(jsonContentType))
-				.andExpect(status().isForbidden());
+		mockMvc.perform(post("/api/v1/user-checks/pin/check").content(json(pin))
+					.contentType(jsonContentType))
+					.andExpect(jsonPath("$.valid", is(false)))
+					.andExpect(status().isOk());
 		
-		mockMvc.perform(post("/api/v1/users/pin/check").content(json(pin))
-				.contentType(jsonContentType))
-				.andExpect(status().isForbidden());
+		mockMvc.perform(post("/api/v1/user-checks/pin/check").content(json(pin))
+					.contentType(jsonContentType))
+					.andExpect(jsonPath("$.valid", is(false)))
+					.andExpect(status().isOk());
 		
 		assertEquals("after three times should be locked",UserStatus.LOCKED,dao.getOne(2l).getStatus());
 	}
@@ -152,7 +157,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		pin.setRecoveryEmail("hons@gmx.net");
 		pin.setPin("3867");
 		
-		mockMvc.perform(post("/api/v1/users/pin").content(json(pin))
+		mockMvc.perform(post("/api/v1/user-checks/pin").content(json(pin))
 				.contentType(jsonContentType))
 				.andExpect(status().isCreated());
 		
@@ -167,7 +172,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		pin.setRecoveryEmail("flo@gmx.net");
 		pin.setPin("3867");
 		
-		mockMvc.perform(post("/api/v1/users/pin").content(json(pin))
+		mockMvc.perform(post("/api/v1/user-checks/pin").content(json(pin))
 				.contentType(jsonContentType))
 				.andExpect(status().isConflict());
 	}
@@ -179,7 +184,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		pin.setRecoveryEmail("hons@gmx.net");
 		pin.setPin("3867");
 		
-		mockMvc.perform(post("/api/v1/users/pin").content(json(pin))
+		mockMvc.perform(post("/api/v1/user-checks/pin").content(json(pin))
 				.contentType(jsonContentType))
 				.andExpect(status().isNotFound());
 	}
@@ -191,7 +196,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		pin.setRecoveryEmail("hons@gmx.net");
 		pin.setPin("3867");
 		
-		mockMvc.perform(post("/api/v1/users/pin").content(json(pin))
+		mockMvc.perform(post("/api/v1/user-checks/pin").content(json(pin))
 				.contentType(jsonContentType))
 				.andExpect(status().isBadRequest());
 	}
@@ -203,7 +208,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		pin.setRecoveryEmail("");
 		pin.setPin("3867");
 		
-		mockMvc.perform(post("/api/v1/users/pin").content(json(pin))
+		mockMvc.perform(post("/api/v1/user-checks/pin").content(json(pin))
 				.contentType(jsonContentType))
 				.andExpect(status().isBadRequest());
 	}
@@ -217,7 +222,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		pin.setRecoveryEmail("hons@gmx.net");
 		pin.setPin("");
 		
-		mockMvc.perform(post("/api/v1/users/pin").content(json(pin))
+		mockMvc.perform(post("/api/v1/user-checks/pin").content(json(pin))
 				.contentType(jsonContentType))
 				.andExpect(status().isBadRequest());
 	}
@@ -230,7 +235,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		pin.setRecoveryEmail("hons@gmx.net");
 		pin.setPin("367");
 		
-		mockMvc.perform(post("/api/v1/users/pin").content(json(pin))
+		mockMvc.perform(post("/api/v1/user-checks/pin").content(json(pin))
 				.contentType(jsonContentType))
 				.andExpect(status().isBadRequest());
 	}
@@ -240,7 +245,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 	@FlywayTest(locationsForMigrate = { "/db/test" })
 	@Transactional
 	public void testApiV1UsersPinUserIdDelete_withExistingUser_shouldDelete() throws Exception {
-		mockMvc.perform(delete("/api/v1/users/pin/1")
+		mockMvc.perform(delete("/api/v1/user-checks/pin/1")
 				.contentType(jsonContentType))
 				.andExpect(status().isOk());
 				
@@ -249,7 +254,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 	
 	@Test
 	public void testApiV1UsersPinUserIdDelete_withNotExistingUser_shouldReturnNotFound() throws Exception {
-		mockMvc.perform(delete("/api/v1/users/pin/765761")
+		mockMvc.perform(delete("/api/v1/user-checks/pin/765761")
 				.contentType(jsonContentType))
 				.andExpect(status().isNotFound());
 	}
@@ -261,8 +266,9 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		unlock.setId(4l);
 		unlock.setUnlockCode("s887q");
 		
-		mockMvc.perform(post("/api/v1/users/unlock").content(json(unlock))
+		mockMvc.perform(post("/api/v1/user-checks/unlock").content(json(unlock))
 				.contentType(jsonContentType))
+				.andExpect(jsonPath("$.isUnlocked", is(true)))
 				.andExpect(status().isOk());
 	}
 	
@@ -273,7 +279,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		unlock.setId(null);
 		unlock.setUnlockCode("s887q");
 		
-		mockMvc.perform(post("/api/v1/users/unlock").content(json(unlock))
+		mockMvc.perform(post("/api/v1/user-checks/unlock").content(json(unlock))
 				.contentType(jsonContentType))
 				.andExpect(status().isBadRequest());
 	}
@@ -285,7 +291,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		unlock.setId(4l);
 		unlock.setUnlockCode("");
 		
-		mockMvc.perform(post("/api/v1/users/unlock").content(json(unlock))
+		mockMvc.perform(post("/api/v1/user-checks/unlock").content(json(unlock))
 				.contentType(jsonContentType))
 				.andExpect(status().isBadRequest());
 	}
@@ -297,9 +303,10 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		unlock.setId(4l);
 		unlock.setUnlockCode("hack");
 		
-		mockMvc.perform(post("/api/v1/users/unlock").content(json(unlock))
+		mockMvc.perform(post("/api/v1/user-checks/unlock").content(json(unlock))
 				.contentType(jsonContentType))
-				.andExpect(status().isForbidden());
+				.andExpect(jsonPath("$.isUnlocked", is(false)))
+				.andExpect(status().isOk());
 	}
 	
 	@Test
@@ -308,7 +315,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		unlock.setId(8768764l);
 		unlock.setUnlockCode("s887q");
 		
-		mockMvc.perform(post("/api/v1/users/unlock").content(json(unlock))
+		mockMvc.perform(post("/api/v1/user-checks/unlock").content(json(unlock))
 				.contentType(jsonContentType))
 				.andExpect(status().isNotFound());
 	}
@@ -319,7 +326,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 	public void testApiV1UsersLockUserIdPost_withExistingUser_shouldLock() throws Exception {
 		doNothing().when(emailService).sendUnlockCodeEmailFor(any(User.class));
 		
-		mockMvc.perform(post("/api/v1/users/lock/1")
+		mockMvc.perform(post("/api/v1/user-checks/lock/1")
 				.contentType(jsonContentType))
 				.andExpect(status().isOk());
 		
@@ -330,7 +337,7 @@ public class AuthUserControllerTest extends BaseControllerTest {
 	
 	@Test
 	public void testApiV1UsersLockUserIdPost_withNotExistingUser_shouldReturnNotFound() throws Exception {
-		mockMvc.perform(post("/api/v1/users/lock/876765")
+		mockMvc.perform(post("/api/v1/user-checks/lock/876765")
 				.contentType(jsonContentType))
 				.andExpect(status().isNotFound());
 	}

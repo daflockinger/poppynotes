@@ -1,0 +1,55 @@
+info:
+  component: Zuul Server
+  
+endpoints:
+  restart:
+    enabled: true
+  shutdown:
+    enabled: true
+  health:
+    sensitive: false
+
+management:
+  security:
+    enabled: false
+
+security:
+  # Disable Spring Boot basic authentication
+  basic:
+    enabled: false
+
+zuul:
+  trace-request-body: true
+  ## enable for live!!!
+  ssl-hostname-validation-enabled: false
+  host:
+    max-per-route-connections: 10
+    max-total-connections: 50
+  retryable: true
+  ignoredServices: "*"
+  routes:
+     user-service:
+       retryable: true
+       path: /api/v1/users**
+       strip-prefix: false
+     # add note-service when done!
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    preferIpAddress: true
+
+server:
+  port: 8081
+  path: /
+  
+  
+## openId config for Google
+google:
+  clientId: 545703912504-27e0405fti21t64ie9gfb1mhppptr5e0.apps.googleusercontent.com
+  clientSecret: Oqu_K7VH9-VwBTJcnDsc5O1M
+  accessTokenUri: https://www.googleapis.com/oauth2/v3/token
+  userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
+  redirectUri: http://localhost:8080/google-login

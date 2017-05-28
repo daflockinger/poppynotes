@@ -1,6 +1,23 @@
 server:
   port: 8001
-
+  
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: poppynotes
+  jackson:
+    date-format: com.flockinger.poppynotes.notesService.config.RFC3339DateFormat
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+    
+springfox:
+  documentation:
+    swagger:
+      v2:
+        path: /api-docs
+        
 eureka:
   client:
     serviceUrl:
@@ -15,3 +32,14 @@ endpoints:
 management:
   security:
     enabled: false
+    
+    
+#### Test Profile
+---
+spring: 
+  profiles: test
+  data:
+    mongodb:
+      host: localhost
+      port: 27117
+      database: poppynotes

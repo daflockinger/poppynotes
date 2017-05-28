@@ -1,0 +1,317 @@
+swagger: '2.0'
+info:
+  title: PoppyNotes Note API
+  description: PoppyNotes Note API
+  version: "1.0.0"
+# array of all schemes that your API supports
+schemes:
+  - https
+# will be prefixed to all paths
+basePath: /api/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+parameters:
+  IdNote:
+    name: noteId
+    in: path
+    description: Unique identifier of a Note.
+    required: true
+    type: string
+  NoteCreate:
+    name: note-create
+    in: body
+    schema:
+      $ref: '#/definitions/CreateNote'
+    required: true  
+  NoteUpdate:
+    name: note-update
+    in: body
+    schema:
+      $ref: '#/definitions/UpdateNote'
+    required: true
+  IdUser:
+    name: userId
+    in: header
+    description: Unique Identifier of the User requesting his notes.
+    type: string
+    required: true
+  Page:
+    name: page
+    in: query
+    description: Page of notes that's beeing returned.
+    default: 0
+    required: false
+    type: integer
+  Items:
+    name: items
+    in: query
+    description: Amount of notes per page. 
+    default: 10
+    required: false
+    type: integer
+  Archived:
+    name: show_archived
+    in: query
+    type: boolean
+    description: If true, only archived notes are returned. 
+    default: false
+    required: false
+paths:
+  /api/v1/notes:
+    get:
+      summary: Get All Notes from user
+      description: Returns all Notes in a shorter form from a user, paginated.
+      parameters:
+        - $ref: '#/parameters/Page'
+        - $ref: '#/parameters/Items'
+        - $ref: '#/parameters/IdUser'
+        - $ref: '#/parameters/Archived'
+      tags: 
+        - Notes
+      responses:
+        200:
+          description: All notes paginated.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/OverviewNote'
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
+    post:
+      summary: Create Note
+      description: Creates new Note entry.
+      parameters:
+        - $ref: '#/parameters/NoteCreate'
+      tags: 
+        - Notes
+      responses:
+        201:
+          description: Created Note.
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
+    put:
+      summary: Update Note
+      description: Updated a Note entry.
+      parameters:
+        - $ref: '#/parameters/NoteUpdate'
+      tags: 
+        - Notes
+      responses:
+        200:
+          description: Note updated.
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
+  /api/v1/notes/{noteId}:
+    get:
+      summary: Get Note
+      description: Fetches Note with defined Id.
+      parameters:
+        - $ref: '#/parameters/IdNote'
+      tags: 
+        - Notes
+      responses:
+        200:
+          description: Note entity.
+          schema:
+            $ref: '#/definitions/CompleteNote'
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
+    delete:
+      summary: Delete Note
+      description: Deletes a Note with defined Id.
+      parameters:
+        - $ref: '#/parameters/IdNote'
+      tags: 
+        - Notes
+      responses:
+        200:
+          description: Note deleted.
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
+definitions:
+  CreateNote:
+    type: object
+    properties:
+      title:
+        type: string
+        description: Title of the Note.
+      content:
+        type: string
+        description: Text content of the Note (the actual note).
+      userId:
+        type: integer
+        format: int64
+        description: Unique Identifier of the user that created that note.
+      lastEdit:
+        type: string
+        format: date
+        description: Date the user last edited the note.
+      pinned:
+        type: boolean
+        description: Pin for important messages to be shown always on top. 
+  UpdateNote:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique Identifier of the Note.
+      title:
+        type: string
+        description: Title of the Note.
+      content:
+        type: string
+        description: Text content of the Note (the actual note).
+      userId:
+        type: integer
+        format: int64
+        description: Unique Identifier of the user that created that note.
+      lastEdit:
+        type: string
+        format: date
+        description: Date the user last edited the note.
+      pinned:
+        type: boolean
+        description: Pin for important messages to be shown always on top. 
+      archived:
+        type: boolean
+        description: Determines if notes is archived and not shown in regular listing (default false).
+  CompleteNote:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique Identifier of the Note.
+      title:
+        type: string
+        description: Title of the Note.
+      content:
+        type: string
+        description: Text content of the Note (the actual note).
+      userId:
+        type: integer
+        format: int64
+        description: Unique Identifier of the user that created that note.
+      lastEdit:
+        type: string
+        format: date
+        description: Date the user last edited the note.
+      archived:
+        type: boolean
+        description: Determines if notes is archived and not shown in regular listing (default false).
+  OverviewNote:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique Identifier of the Note.
+      title:
+        type: string
+        description: Title of the Note.
+      partContent:
+        type: string
+        description: Only the first lines of the text content.
+      lastEdit:
+        type: string
+        format: date
+        description: Date the user last edited the note.
+      pinned:
+        type: boolean
+        description: Pin for important messages to be shown always on top.
+      archived:
+        type: boolean
+        description: Determines if notes is archived and not shown in regular listing (default false).
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: object
+        description: Invalid fields.
+        additionalProperties:
+          type: string

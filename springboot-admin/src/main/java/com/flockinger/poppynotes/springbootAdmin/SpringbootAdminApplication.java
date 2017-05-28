@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 import de.codecentric.boot.admin.config.EnableAdminServer;
 
-//@SpringBootApplication
+@SpringBootApplication
 @Configuration
 @EnableAutoConfiguration
 @EnableAdminServer

@@ -11,15 +11,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.flockinger.poppynotes.userService.dto.AuthUser;
+import com.flockinger.poppynotes.userService.dto.CheckPinResult;
 import com.flockinger.poppynotes.userService.dto.CreatePin;
 import com.flockinger.poppynotes.userService.dto.SendPin;
 import com.flockinger.poppynotes.userService.dto.ShowUser;
 import com.flockinger.poppynotes.userService.dto.Unlock;
+import com.flockinger.poppynotes.userService.dto.UnlockResult;
 import com.flockinger.poppynotes.userService.exception.DtoValidationFailedException;
 import com.flockinger.poppynotes.userService.exception.InvalidEmailServerConfigurationException;
 import com.flockinger.poppynotes.userService.exception.PinAlreadyExistingException;
 import com.flockinger.poppynotes.userService.exception.UserNotFoundException;
-import com.flockinger.poppynotes.userService.exception.WrongUnlockCodeException;
 import com.flockinger.poppynotes.userService.service.AuthUserService;
 
 import io.swagger.annotations.ApiParam;
@@ -38,18 +39,14 @@ public class AuthUserApiController implements AuthUserApi {
 		return new ResponseEntity<ShowUser>(userInfo, HttpStatus.OK);
 	}
 
-	public ResponseEntity<Void> apiV1UsersPinCheckPost(@ApiParam(value = "") @Valid @RequestBody SendPin pinSend,
+	public ResponseEntity<CheckPinResult> apiV1UsersPinCheckPost(@ApiParam(value = "") @Valid @RequestBody SendPin pinSend,
 			BindingResult bindingResult)
 			throws DtoValidationFailedException, UserNotFoundException, InvalidEmailServerConfigurationException {
 
 		assertRequest(bindingResult);
-		boolean isPinCorrect = service.checkPin(pinSend);
+		CheckPinResult result = service.checkPin(pinSend);
 		
-		if(isPinCorrect) {
-			return new ResponseEntity<Void>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<Void>(HttpStatus.FORBIDDEN);
-		}
+		return new ResponseEntity<CheckPinResult>(result, HttpStatus.OK);
 	}
 
 	public ResponseEntity<Void> apiV1UsersPinPost(@ApiParam(value = "") @Valid @RequestBody CreatePin pinCreate,
@@ -69,13 +66,13 @@ public class AuthUserApiController implements AuthUserApi {
 		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 
-	public ResponseEntity<Void> apiV1UsersUnlockPost(@ApiParam(value = "") @Valid @RequestBody Unlock userUnlock,
+	public ResponseEntity<UnlockResult> apiV1UsersUnlockPost(@ApiParam(value = "") @Valid @RequestBody Unlock userUnlock,
 			BindingResult bindingResult)
-			throws DtoValidationFailedException, UserNotFoundException, WrongUnlockCodeException {
+			throws DtoValidationFailedException, UserNotFoundException {
 
 		assertRequest(bindingResult);
-		service.unlockUser(userUnlock);
-		return new ResponseEntity<Void>(HttpStatus.OK);
+		UnlockResult result = service.unlockUser(userUnlock);
+		return new ResponseEntity<UnlockResult>(result,HttpStatus.OK);
 	}
 
 	public ResponseEntity<Void> apiV1UsersLockUserIdPost(

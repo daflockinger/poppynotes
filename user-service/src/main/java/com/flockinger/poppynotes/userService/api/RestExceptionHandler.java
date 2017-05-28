@@ -13,12 +13,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.flockinger.poppynotes.userService.dto.Error;
 import com.flockinger.poppynotes.userService.exception.DtoValidationFailedException;
 import com.flockinger.poppynotes.userService.exception.DuplicateUserException;
 import com.flockinger.poppynotes.userService.exception.PinAlreadyExistingException;
 import com.flockinger.poppynotes.userService.exception.UserNotFoundException;
-import com.flockinger.poppynotes.userService.exception.WrongUnlockCodeException;
-import com.flockinger.poppynotes.userService.dto.Error;
 
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
@@ -45,15 +44,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     	return handleExceptionInternal(ex, createErrorModel(ex), 
           new HttpHeaders(), HttpStatus.CONFLICT, request);
     }
-    
-    
-    @ExceptionHandler(value = {WrongUnlockCodeException.class})
-    protected ResponseEntity<Object> handleForbidden(Exception ex, WebRequest request) {
-       
-    	return handleExceptionInternal(ex, createErrorModel(ex), 
-          new HttpHeaders(), HttpStatus.FORBIDDEN, request);
-    }
-    
         
     private Error createErrorValidatedModel(DtoValidationFailedException validationException){
     	Error error = createErrorModel(validationException);
