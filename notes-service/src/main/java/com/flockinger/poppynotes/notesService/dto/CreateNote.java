@@ -3,6 +3,8 @@ package com.flockinger.poppynotes.notesService.dto;
 import java.util.Date;
 import java.util.Objects;
 
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
@@ -12,18 +14,23 @@ import io.swagger.annotations.ApiModelProperty;
  */
 
 public class CreateNote {
+	
+	@NotNull
 	@JsonProperty("title")
 	private String title = null;
 
 	@JsonProperty("content")
 	private String content = null;
 
+	@NotNull
 	@JsonProperty("userId")
 	private Long userId = null;
 
+	@NotNull
 	@JsonProperty("lastEdit")
 	private Date lastEdit = null;
 
+	@NotNull
 	@JsonProperty("pinned")
 	private Boolean pinned = null;
 

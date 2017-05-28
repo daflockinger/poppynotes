@@ -82,6 +82,7 @@ public class TestDataFactory {
 				"Tenderloin frankfurter bacon turducken spare ribs drumstick landjaeger pork loin kevin jowl pastrami salami cupim. Turducken bacon chuck, spare ribs burgdoggen andouille pig short loin kevin short ribs brisket.");
 
 		Note note10 = new Note();
+		note10.setId("existingNoteId");
 		note10.setUserId(1l);
 		note10.setLastEdit(new Date(10000));
 		note10.setTitle("1latest");
@@ -168,6 +169,7 @@ public class TestDataFactory {
 				"archived - Tenderloin frankfurter bacon turducken spare ribs drumstick landjaeger pork loin kevin jowl pastrami salami cupim. Turducken bacon chuck, spare ribs burgdoggen andouille pig short loin kevin short ribs brisket.");
 
 		ArchivedNote note10 = new ArchivedNote();
+		note10.setId("aexistingNoteId");
 		note10.setUserId(1l);
 		note10.setLastEdit(new Date(10000));
 		note10.setTitle("a1latest");
