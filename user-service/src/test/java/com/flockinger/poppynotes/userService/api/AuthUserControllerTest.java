@@ -43,10 +43,12 @@ public class AuthUserControllerTest extends BaseControllerTest {
 		;
 		mockMvc.perform(post("/api/v1/user-checks/auth").content(json(auth)).contentType(jsonContentType))
 				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id", is(2)))
 				.andExpect(jsonPath("$.name", is("sepp")))
 				.andExpect(jsonPath("$.recoveryEmail", is("sep@gmx.net")))
 				.andExpect(jsonPath("$.roles[0]", is("AUTHOR")))
-				.andExpect(jsonPath("$.status", is("ACTIVE")));
+				.andExpect(jsonPath("$.status", is("ACTIVE")))
+				.andExpect(jsonPath("$.cryptKey", is("89768iksgd")));
 	}
 
 	@Test

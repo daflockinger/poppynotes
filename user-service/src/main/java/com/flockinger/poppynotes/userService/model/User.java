@@ -46,7 +46,6 @@ public class User {
 
 	private String unlockCode;
 
-	@Lob
 	private String cryptKey;
 
 	public Long getId() {

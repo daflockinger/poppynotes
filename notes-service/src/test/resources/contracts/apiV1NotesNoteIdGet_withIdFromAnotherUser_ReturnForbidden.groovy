@@ -12,7 +12,7 @@ org.springframework.cloud.contract.spec.Contract.make {
 		status 403
 		body([
 			   code: null,
-			   message: $(regex('.+'))
+			   message: $(regex('[a-zA-Z]+'))
 		])
 		headers {
 			contentType('application/json')

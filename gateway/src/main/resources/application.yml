@@ -32,8 +32,10 @@ zuul:
        retryable: true
        path: /api/v1/users**
        strip-prefix: false
-     # add note-service when done!
-
+     note-service:
+       retryable: true
+       path: /api/v1/notes**
+       strip-prefix: false
 eureka:
   client:
     serviceUrl:
@@ -45,6 +47,9 @@ server:
   port: 8081
   path: /
   
+cache:
+  caffeine:
+    spec: initialCapacity=10,maximumSize=100,expireAfterAccess=1d
   
 ## openId config for Google
 google:
@@ -53,3 +58,47 @@ google:
   accessTokenUri: https://www.googleapis.com/oauth2/v3/token
   userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
   redirectUri: http://localhost:8080/google-login
+  
+  
+#### Test Profile
+---
+spring: 
+  profiles: test
+  
+zuul:
+  trace-request-body: true
+  ## enable for live!!!
+  ssl-hostname-validation-enabled: false
+  host:
+    max-per-route-connections: 10
+    max-total-connections: 50
+  retryable: true
+  ignoredServices: "*"
+  routes:
+     user-service:
+       url: http://127.0.0.1:8002
+       retryable: true
+       path: /api/v1/users/**
+       strip-prefix: false
+     note-service:
+       url: http://127.0.0.1:8001
+       retryable: true
+       path: /api/v1/notes/**
+       strip-prefix: false 
+eureka:
+  client:
+    enabled: false
+    
+management:
+  security:
+    enabled: false
+
+cache:
+  caffeine:
+    spec: initialCapacity=3,maximumSize=10,expireAfterAccess=3s
+
+security:
+  # Disable Spring Boot basic authentication
+  basic:
+    enabled: false
+       

@@ -13,7 +13,7 @@ org.springframework.cloud.contract.spec.Contract.make {
 			title: 'a1latest',
 			lastEdit: $(regex('.+')),
 			archived: true,
-			content: $(regex('.+'))
+			content: $(regex('[a-zA-Z]+'))
 		])
 		headers { contentType('application/json') }
 	}

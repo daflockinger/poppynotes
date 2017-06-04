@@ -17,7 +17,7 @@ org.springframework.cloud.contract.spec.Contract.make {
 				  lastEdit: $(regex('.+')),
 				  pinned: true,
 				  archived: null,
-				  partContent: $(regex('.+'))
+				  partContent: $(regex('[a-zA-Z]+'))
 			  ],
 			  [
 				  id: $(regex('.+')),
@@ -25,7 +25,7 @@ org.springframework.cloud.contract.spec.Contract.make {
 				  lastEdit: $(regex('.+')),
 				  pinned: false,
 				  archived: null,
-				  partContent: $(regex('.+'))
+				  partContent: $(regex('[a-zA-Z]+'))
 			  ]
 		])
 		headers {
