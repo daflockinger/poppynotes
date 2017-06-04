@@ -14,10 +14,12 @@ org.springframework.cloud.contract.spec.Contract.make {
 	response { 
 		status 200 
 		body([ 
+			   id: 2,
 			   name: "sepp",
 			   recoveryEmail: "sep@gmx.net",
 			   roles: ["AUTHOR"],
 			   status: "ACTIVE",
+			   cryptKey: "89768iksgd",
 		])
 		headers { 
 			contentType('application/json')

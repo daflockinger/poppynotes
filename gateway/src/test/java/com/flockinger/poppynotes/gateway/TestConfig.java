@@ -1,15 +1,17 @@
-package com.flockinger.poppynotes.gateway.service;
+package com.flockinger.poppynotes.gateway;
 
 import java.io.IOException;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
-public class RestTemplateConfig {
-	@Bean
+public class TestConfig {
+	@Primary
+	@Bean(name="testRestTemplate")
 	RestTemplate restTemplate() {
 		RestTemplate template = new RestTemplate();
 		template.setErrorHandler(getResponseErrorHandler());

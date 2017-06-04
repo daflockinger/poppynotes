@@ -157,6 +157,7 @@ paths:
       description: Fetches Note with defined Id.
       parameters:
         - $ref: '#/parameters/IdNote'
+        - $ref: '#/parameters/IdUser'
       tags: 
         - Notes
       responses:

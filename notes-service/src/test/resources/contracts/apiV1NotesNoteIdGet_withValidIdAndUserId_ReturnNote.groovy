@@ -13,7 +13,7 @@ org.springframework.cloud.contract.spec.Contract.make {
 			title: '1latest',
 			lastEdit: $(regex('.+')),
 			archived: false,
-			content: $(regex('.+'))
+			content: 'this is a secret message.'
 		])
 		headers { contentType('application/json') }
 	}

@@ -181,7 +181,7 @@ paths:
         200:
           description: User info.
           schema:
-            $ref: '#/definitions/ShowUser'
+            $ref: '#/definitions/AuthUserResponse'
         400:
           description: Bad request (validation failed).
           schema:
@@ -441,6 +441,35 @@ definitions:
           enum:
             - AUTHOR
             - ADMIN
+  AuthUserResponse:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Display name.
+      recoveryEmail:
+        type: string
+        description: Email for Two-factor authorization.
+      status:
+        type: string
+        enum:
+          - ACTIVE
+          - DISABLED
+          - STRIKE_ONE
+          - STRIKE_TWO
+          - LOCKED
+        description: Status of the User.
+      roles:
+        type: array
+        items:
+          type: string
+          description: Role of a User (authorized to to specific stuff).
+          enum:
+            - AUTHOR
+            - ADMIN
+      cryptKey:
+        type: string
+        description: Key for message encryption, should be manually & random created and very long.
   AuthUser:
     type: object
     properties:

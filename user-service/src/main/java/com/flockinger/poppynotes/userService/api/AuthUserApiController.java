@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.flockinger.poppynotes.userService.dto.AuthUser;
+import com.flockinger.poppynotes.userService.dto.AuthUserResponse;
 import com.flockinger.poppynotes.userService.dto.CheckPinResult;
 import com.flockinger.poppynotes.userService.dto.CreatePin;
 import com.flockinger.poppynotes.userService.dto.SendPin;
@@ -31,12 +32,12 @@ public class AuthUserApiController implements AuthUserApi {
 	@Autowired
 	private AuthUserService service;
 
-	public ResponseEntity<ShowUser> apiV1UsersAuthPost(@ApiParam(value = "") @Valid @RequestBody AuthUser userAuth,
+	public ResponseEntity<AuthUserResponse> apiV1UsersAuthPost(@ApiParam(value = "") @Valid @RequestBody AuthUser userAuth,
 			BindingResult bindingResult) throws DtoValidationFailedException, UserNotFoundException {
 
 		assertRequest(bindingResult);
-		ShowUser userInfo = service.getUserByAuthEmailHash(userAuth);
-		return new ResponseEntity<ShowUser>(userInfo, HttpStatus.OK);
+		AuthUserResponse userInfo = service.getUserByAuthEmailHash(userAuth);
+		return new ResponseEntity<AuthUserResponse>(userInfo, HttpStatus.OK);
 	}
 
 	public ResponseEntity<CheckPinResult> apiV1UsersPinCheckPost(@ApiParam(value = "") @Valid @RequestBody SendPin pinSend,

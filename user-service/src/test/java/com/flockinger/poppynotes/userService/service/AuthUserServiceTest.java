@@ -21,6 +21,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.flockinger.poppynotes.userService.dao.UserRepository;
 import com.flockinger.poppynotes.userService.dto.AuthUser;
+import com.flockinger.poppynotes.userService.dto.AuthUserResponse;
 import com.flockinger.poppynotes.userService.dto.CreatePin;
 import com.flockinger.poppynotes.userService.dto.RolesEnum;
 import com.flockinger.poppynotes.userService.dto.SendPin;
@@ -57,12 +58,14 @@ public class AuthUserServiceTest extends BaseServiceTest {
 		AuthUser auth = new AuthUser();
 		auth.setAuthEmail("hons@gmail.com");
 
-		ShowUser user = service.getUserByAuthEmailHash(auth);
+		AuthUserResponse user = service.getUserByAuthEmailHash(auth);
 		assertNotNull(user);
+		assertEquals("verify id", 3l, user.getId().longValue());
 		assertEquals("verify user name", "hons", user.getName());
 		assertEquals("verify recovery email", "hons@gmx.net", user.getRecoveryEmail());
 		assertEquals("verify user role", RolesEnum.AUTHOR, user.getRoles().stream().findAny().get());
 		assertEquals("verify user status", StatusEnum.ACTIVE, user.getStatus());
+		assertEquals("verify user key", "kjhs89j3", user.getCryptKey());
 	}
 
 	@Test(expected = UserNotFoundException.class)

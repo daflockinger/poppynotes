@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.flockinger.poppynotes.userService.dto.AuthUser;
+import com.flockinger.poppynotes.userService.dto.AuthUserResponse;
 import com.flockinger.poppynotes.userService.dto.CheckPinResult;
 import com.flockinger.poppynotes.userService.dto.CreatePin;
 import com.flockinger.poppynotes.userService.dto.Error;
@@ -29,7 +30,7 @@ public interface AuthUserApi {
 
 	@ApiOperation(value = "Check if user exists", notes = "Checkes if user exists and returns info if so.", response = ShowUser.class, tags = {
 			"Users", })
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "User info.", response = ShowUser.class),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "User info.", response = AuthUserResponse.class),
 			@ApiResponse(code = 400, message = "Bad request (validation failed).", response = Error.class),
 			@ApiResponse(code = 401, message = "Unauthorized (need to log in / get token).", response = Void.class),
 			@ApiResponse(code = 403, message = "Forbidden (no rights to access resource).", response = Void.class),
@@ -38,7 +39,7 @@ public interface AuthUserApi {
 			@ApiResponse(code = 500, message = "Internal Server Error.", response = Void.class) })
 	@RequestMapping(value = "/api/v1/user-checks/auth", produces = { "application/json" }, consumes = {
 			"application/json" }, method = RequestMethod.POST)
-	ResponseEntity<ShowUser> apiV1UsersAuthPost(@ApiParam(value = "") @RequestBody AuthUser userAuth,
+	ResponseEntity<AuthUserResponse> apiV1UsersAuthPost(@ApiParam(value = "") @RequestBody AuthUser userAuth,
 			BindingResult bindingResult) throws DtoValidationFailedException, UserNotFoundException;
 
 	@ApiOperation(value = "Checks pin of user", notes = "Fetches User info with defined Id.", response = Void.class, tags = {

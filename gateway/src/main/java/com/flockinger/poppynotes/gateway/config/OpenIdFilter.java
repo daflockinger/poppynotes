@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,9 +31,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flockinger.poppynotes.gateway.exception.UnregisteredUserException;
 import com.flockinger.poppynotes.gateway.model.OpenIdUserDetails;
 import com.flockinger.poppynotes.gateway.model.Role;
-import com.flockinger.poppynotes.gateway.model.UserInfo;
+import com.flockinger.poppynotes.gateway.model.AuthUserResponse;
 import com.flockinger.poppynotes.gateway.service.UserClientService;
 
+@Profile("default")
 @Component
 public class OpenIdFilter extends AbstractAuthenticationProcessingFilter {
 
@@ -68,7 +70,7 @@ public class OpenIdFilter extends AbstractAuthenticationProcessingFilter {
 			Map<String, String> authInfo = new ObjectMapper().readValue(tokenDecoded.getClaims(), Map.class);
 
 			OpenIdUserDetails user = new OpenIdUserDetails(authInfo, accessToken);
-			UserInfo info = userService.getUserInfoFromAuthEmail(user.getUsername());
+			AuthUserResponse info = userService.getUserInfoFromAuthEmail(user.getUsername());
 			user.setAuthorities(rolesToAthorities(info.getRoles()));
 			
 			return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());

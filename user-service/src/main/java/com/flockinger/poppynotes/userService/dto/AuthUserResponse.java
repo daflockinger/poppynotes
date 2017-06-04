@@ -1,48 +1,36 @@
 package com.flockinger.poppynotes.userService.dto;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * UpdateUser
+ * AuthUserResponse
  */
-public class UpdateUser {
+
+public class AuthUserResponse {
+
 	@JsonProperty("id")
 	private Long id = null;
 
 	@JsonProperty("name")
-	@NotEmpty
 	private String name = null;
 
-	@JsonProperty("authEmail")
-	@NotEmpty
-	@Email
-	private String authEmail = null;
-
 	@JsonProperty("recoveryEmail")
-	@NotEmpty
-	@Email
 	private String recoveryEmail = null;
 
 	@JsonProperty("status")
-	@NotNull
 	private StatusEnum status = null;
 
 	@JsonProperty("roles")
-	@NotEmpty
-	@Valid
-	private Set<RolesEnum> roles = new HashSet<RolesEnum>();
+	private List<RolesEnum> roles = new ArrayList<RolesEnum>();
+
+	@JsonProperty("cryptKey")
+	private String cryptKey = null;
 
 	/**
 	 * Unique Identifier of the User.
@@ -56,11 +44,6 @@ public class UpdateUser {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public UpdateUser name(String name) {
-		this.name = name;
-		return this;
 	}
 
 	/**
@@ -77,30 +60,6 @@ public class UpdateUser {
 		this.name = name;
 	}
 
-	public UpdateUser authEmail(String authEmail) {
-		this.authEmail = authEmail;
-		return this;
-	}
-
-	/**
-	 * Hash of authorization email used in SSO
-	 * 
-	 * @return authEmail
-	 **/
-	@ApiModelProperty(value = "Hash of authorization email used in SSO")
-	public String getAuthEmail() {
-		return authEmail;
-	}
-
-	public void setAuthEmail(String authEmail) {
-		this.authEmail = authEmail;
-	}
-
-	public UpdateUser recoveryEmail(String recoveryEmail) {
-		this.recoveryEmail = recoveryEmail;
-		return this;
-	}
-
 	/**
 	 * Email for Two-factor authorization.
 	 * 
@@ -113,11 +72,6 @@ public class UpdateUser {
 
 	public void setRecoveryEmail(String recoveryEmail) {
 		this.recoveryEmail = recoveryEmail;
-	}
-
-	public UpdateUser status(StatusEnum status) {
-		this.status = status;
-		return this;
 	}
 
 	/**
@@ -134,28 +88,33 @@ public class UpdateUser {
 		this.status = status;
 	}
 
-	public UpdateUser roles(Set<RolesEnum> roles) {
-		this.roles = roles;
-		return this;
-	}
-
-	public UpdateUser addRolesItem(RolesEnum rolesItem) {
-		this.roles.add(rolesItem);
-		return this;
-	}
-
 	/**
 	 * Get roles
 	 * 
 	 * @return roles
 	 **/
 	@ApiModelProperty(value = "")
-	public Set<RolesEnum> getRoles() {
+	public List<RolesEnum> getRoles() {
 		return roles;
 	}
 
-	public void setRoles(Set<RolesEnum> roles) {
+	public void setRoles(List<RolesEnum> roles) {
 		this.roles = roles;
+	}
+
+	/**
+	 * Key for message encryption, should be manually & random created and very
+	 * long.
+	 * 
+	 * @return cryptKey
+	 **/
+	@ApiModelProperty(value = "Key for message encryption, should be manually & random created and very long.")
+	public String getCryptKey() {
+		return cryptKey;
+	}
+
+	public void setCryptKey(String cryptKey) {
+		this.cryptKey = cryptKey;
 	}
 
 	@Override
@@ -166,29 +125,29 @@ public class UpdateUser {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		UpdateUser updateUser = (UpdateUser) o;
-		return Objects.equals(this.id, updateUser.id) && Objects.equals(this.name, updateUser.name)
-				&& Objects.equals(this.authEmail, updateUser.authEmail)
-				&& Objects.equals(this.recoveryEmail, updateUser.recoveryEmail)
-				&& Objects.equals(this.status, updateUser.status) && Objects.equals(this.roles, updateUser.roles);
+		AuthUserResponse authUserResponse = (AuthUserResponse) o;
+		return Objects.equals(this.name, authUserResponse.name)
+				&& Objects.equals(this.recoveryEmail, authUserResponse.recoveryEmail)
+				&& Objects.equals(this.status, authUserResponse.status)
+				&& Objects.equals(this.roles, authUserResponse.roles)
+				&& Objects.equals(this.cryptKey, authUserResponse.cryptKey);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, name, authEmail, recoveryEmail, status, roles);
+		return Objects.hash(name, recoveryEmail, status, roles, cryptKey);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("class UpdateUser {\n");
+		sb.append("class AuthUserResponse {\n");
 
-		sb.append("    id: ").append(toIndentedString(id)).append("\n");
 		sb.append("    name: ").append(toIndentedString(name)).append("\n");
-		sb.append("    authEmail: ").append(toIndentedString(authEmail)).append("\n");
 		sb.append("    recoveryEmail: ").append(toIndentedString(recoveryEmail)).append("\n");
 		sb.append("    status: ").append(toIndentedString(status)).append("\n");
 		sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
+		sb.append("    cryptKey: ").append(toIndentedString(cryptKey)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

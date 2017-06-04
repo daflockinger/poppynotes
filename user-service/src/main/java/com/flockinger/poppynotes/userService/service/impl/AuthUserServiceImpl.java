@@ -9,10 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.flockinger.poppynotes.userService.dao.UserRepository;
 import com.flockinger.poppynotes.userService.dto.AuthUser;
+import com.flockinger.poppynotes.userService.dto.AuthUserResponse;
 import com.flockinger.poppynotes.userService.dto.CheckPinResult;
 import com.flockinger.poppynotes.userService.dto.CreatePin;
 import com.flockinger.poppynotes.userService.dto.SendPin;
-import com.flockinger.poppynotes.userService.dto.ShowUser;
 import com.flockinger.poppynotes.userService.dto.Unlock;
 import com.flockinger.poppynotes.userService.dto.UnlockResult;
 import com.flockinger.poppynotes.userService.exception.InvalidEmailServerConfigurationException;
@@ -37,7 +37,7 @@ public class AuthUserServiceImpl implements AuthUserService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public ShowUser getUserByAuthEmailHash(AuthUser userAuth) throws UserNotFoundException {
+	public AuthUserResponse getUserByAuthEmailHash(AuthUser userAuth) throws UserNotFoundException {
 		User user = dao.findByAuthEmail(userAuth.getAuthEmail());
 
 		if (user == null) {
@@ -146,7 +146,7 @@ public class AuthUserServiceImpl implements AuthUserService {
 		return RandomStringUtils.randomAlphabetic(5);
 	}
 
-	private ShowUser map(User user) {
-		return mapper.map(user, ShowUser.class);
+	private AuthUserResponse map(User user) {
+		return mapper.map(user, AuthUserResponse.class);
 	}
 }
