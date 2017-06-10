@@ -9,9 +9,11 @@ import com.flockinger.poppynotes.gateway.service.NoteEncryptionService;
 @Service
 public class NoteEncryptionServiceImpl implements NoteEncryptionService {
 
+	private final static String ENCRYPTION_ALGORITHM = "AES";
+	
 	@Override
 	public InputStream encryptNote(InputStream noteMessage, String key) {
-		// TODO Auto-generated method stub
+
 		return null;
 	}
 
@@ -20,5 +22,5 @@ public class NoteEncryptionServiceImpl implements NoteEncryptionService {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
 }

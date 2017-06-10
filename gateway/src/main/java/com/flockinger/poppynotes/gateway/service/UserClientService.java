@@ -9,5 +9,5 @@ import com.flockinger.poppynotes.gateway.model.AuthUserResponse;
 @Service
 public interface UserClientService {
 	AuthUserResponse getUserInfoFromAuthEmail(String authEmail) throws UnregisteredUserException;
-	AuthUserResponse getCachedUserById(Long userId) throws UserNotCachedException;
+	void clearCachedUser(String authEmail);
 }

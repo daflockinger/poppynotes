@@ -58,7 +58,7 @@ public class CloudConfig {
 	
 	@Bean
     public CacheManager cacheManager() {
-		CaffeineCacheManager caffeineManager = new CaffeineCacheManager("usersFromEmail","usersForId");
+		CaffeineCacheManager caffeineManager = new CaffeineCacheManager("usersFromEmail");
 		caffeineManager.setCacheSpecification(caffeineSpec);
         return caffeineManager;
     }

@@ -9,14 +9,14 @@ endpoints:
   health:
     sensitive: false
 
-management:
-  security:
-    enabled: false
+#management:
+#  security:
+#    enabled: false
 
-security:
+#security:
   # Disable Spring Boot basic authentication
-  basic:
-    enabled: false
+#  basic:
+#    enabled: false
 
 zuul:
   trace-request-body: true
@@ -89,16 +89,16 @@ eureka:
   client:
     enabled: false
     
-management:
-  security:
-    enabled: false
+#management:
+#  security:
+#    enabled: false
 
 cache:
   caffeine:
-    spec: initialCapacity=3,maximumSize=10,expireAfterAccess=3s
+    spec: initialCapacity=3,maximumSize=10,expireAfterAccess=30s
 
-security:
+#security:
   # Disable Spring Boot basic authentication
-  basic:
-    enabled: false
+#  basic:
+#    enabled: false
        
