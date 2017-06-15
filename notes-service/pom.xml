@@ -118,7 +118,7 @@
 					<baseClassForTests>com.flockinger.poppynotes.notesService.api.BaseContractTest</baseClassForTests>
 				</configuration> -->
 			</plugin>
-			<!-- <plugin> <groupId>io.swagger</groupId> <artifactId>swagger-codegen-maven-plugin</artifactId> 
+			<!--  <plugin> <groupId>io.swagger</groupId> <artifactId>swagger-codegen-maven-plugin</artifactId> 
 				<version>2.2.2</version> <executions> <execution> <goals> <goal>generate</goal> 
 				</goals> <configuration> <inputSpec>src/main/resources/swagger.yml</inputSpec> 
 				<language>spring</language> <configOptions> <sourceFolder>/cgen/java/main</sourceFolder> 

@@ -42,6 +42,23 @@ public class UpdateNote {
 	@JsonProperty("archived")
 	private Boolean archived = null;
 
+	@NotNull
+	@JsonProperty("initVector")
+	private String initVector = null;
+
+	   /**
+	   * Initialization Vector (iv) used for message en/decryption
+	   * @return initVector
+	  **/
+	  @ApiModelProperty(value = "Initialization Vector (iv) used for message en/decryption")
+	  public String getInitVector() {
+	    return initVector;
+	  }
+
+	  public void setInitVector(String initVector) {
+	    this.initVector = initVector;
+	  }
+	
 	/**
 	 * Unique Identifier of the Note.
 	 * 
@@ -153,7 +170,8 @@ public class UpdateNote {
 		return Objects.equals(this.id, updateNote.id) && Objects.equals(this.title, updateNote.title)
 				&& Objects.equals(this.content, updateNote.content) && Objects.equals(this.userId, updateNote.userId)
 				&& Objects.equals(this.lastEdit, updateNote.lastEdit) && Objects.equals(this.pinned, updateNote.pinned)
-				&& Objects.equals(this.archived, updateNote.archived);
+				&& Objects.equals(this.archived, updateNote.archived) &&
+		        Objects.equals(this.initVector, updateNote.initVector);
 	}
 
 	@Override
@@ -173,6 +191,7 @@ public class UpdateNote {
 		sb.append("    lastEdit: ").append(toIndentedString(lastEdit)).append("\n");
 		sb.append("    pinned: ").append(toIndentedString(pinned)).append("\n");
 		sb.append("    archived: ").append(toIndentedString(archived)).append("\n");
+		sb.append("    initVector: ").append(toIndentedString(initVector)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}
