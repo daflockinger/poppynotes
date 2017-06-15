@@ -53,8 +53,8 @@ cache:
   
 ## openId config for Google
 google:
-  clientId: 545703912504-27e0405fti21t64ie9gfb1mhppptr5e0.apps.googleusercontent.com
-  clientSecret: Oqu_K7VH9-VwBTJcnDsc5O1M
+  clientId: 
+  clientSecret: 
   accessTokenUri: https://www.googleapis.com/oauth2/v3/token
   userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
   redirectUri: http://localhost:8080/google-login

@@ -33,19 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
         .antMatchers("/api/v1/users**").hasAuthority("ADMIN")
         .antMatchers("/api/v1/notes**").hasAnyAuthority("ADMIN", "AUTHOR")
-        /*
-        .antMatchers(HttpMethod.GET, "/api/v1/users/info/**").permitAll()
-        .antMatchers(HttpMethod.GET, "/api/v1/users/*").hasAuthority("ADMIN")
-        .antMatchers(HttpMethod.GET, "/api/v1/users").hasAuthority("ADMIN")
-        .antMatchers(HttpMethod.GET, "/api/v1/posts/author/**").hasAnyAuthority("ADMIN", "AUTHOR")
-        .antMatchers(HttpMethod.POST, "/api/v1/posts").hasAnyAuthority("ADMIN", "AUTHOR")
-        .antMatchers(HttpMethod.PUT, "/api/v1/posts").hasAnyAuthority("ADMIN", "AUTHOR")
-        .antMatchers(HttpMethod.DELETE, "/api/v1/posts/*").hasAnyAuthority("ADMIN", "AUTHOR")
-        .antMatchers(HttpMethod.PUT, "/api/v1/posts/rewind/*").hasAnyAuthority("ADMIN", "AUTHOR")
-        .antMatchers(HttpMethod.POST, "/api/v1/**").hasAuthority("ADMIN")
-        .antMatchers(HttpMethod.PUT, "/api/v1/**").hasAuthority("ADMIN")
-        .antMatchers(HttpMethod.DELETE, "/api/v1/**").hasAuthority("ADMIN")
-*/      .antMatchers("/").hasAuthority("ADMIN")
+        .antMatchers("/").hasAuthority("ADMIN")
         .antMatchers("/swagger-ui.html").hasAuthority("ADMIN");
     }
 }

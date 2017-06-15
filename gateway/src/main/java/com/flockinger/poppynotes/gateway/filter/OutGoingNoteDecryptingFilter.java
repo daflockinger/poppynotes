@@ -34,7 +34,7 @@ public class OutGoingNoteDecryptingFilter extends ZuulFilter {
 		AuthUserResponse userDetails = userService.getUserInfoFromAuthEmail(principal.getName());
 
 		InputStream decryptedNoteStream = encryptionService.decryptNote(ctx.getResponseDataStream(),
-				userDetails.getCryptKey());
+				userDetails.getCryptKey(),principal.getName());
 		ctx.setResponseDataStream(decryptedNoteStream);
 		ctx.setSendZuulResponse(true);
 		return null;

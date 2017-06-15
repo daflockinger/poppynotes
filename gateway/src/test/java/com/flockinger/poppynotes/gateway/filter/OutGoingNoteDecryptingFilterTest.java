@@ -41,7 +41,7 @@ public class OutGoingNoteDecryptingFilterTest extends EncryptionFilterBaseTest{
 		response.setCryptKey("sikdfyh089oay3i3ip2wr3o2rj3wio8yf");
 		when(userService.getUserInfoFromAuthEmail(matches("daflockinger@gmail.com"))).thenReturn(response);
 		String decryptedSecretMessage = "{\"id\":\"no1\",\"title\":\"top secret\",\"lastEdit\":null,\"archived\":false,\"content\":\"Prosciutto brisket pork turkey filet mignon landjaeger cow.\"}";
-		when(encryptionService.decryptNote(any(), matches(response.getCryptKey())))
+		when(encryptionService.decryptNote(any(), matches(response.getCryptKey()),any()))
 				.thenReturn(new ByteArrayInputStream(decryptedSecretMessage.getBytes()));
 
 		MvcResult result = 
@@ -49,24 +49,24 @@ public class OutGoingNoteDecryptingFilterTest extends EncryptionFilterBaseTest{
 		
 		assertEquals("correct response returns 200", 200, result.getResponse().getStatus());
 		assertEquals("check mock-decrypted message", decryptedSecretMessage, result.getResponse().getContentAsString());
-		verify(encryptionService,times(1)).decryptNote(any(), matches(response.getCryptKey()));
+		verify(encryptionService,times(1)).decryptNote(any(), matches(response.getCryptKey()),any());
 	}
 	
 	@Test
 	public void testFilter_withNotesPostCall_shouldNotFilter() throws Exception {		
 		mockMvc.perform(post("/api/v1/notes/existingNoteId").contentType(jsonContentType));
-		verify(encryptionService,times(0)).decryptNote(any(), any());
+		verify(encryptionService,times(0)).decryptNote(any(), any(),any());
 	}
 	
 	@Test
 	public void testFilter_withNotesPutCall_shouldNotFilter() throws Exception {
 		mockMvc.perform(put("/api/v1/notes/existingNoteId").contentType(jsonContentType));
-		verify(encryptionService,times(0)).decryptNote(any(), any());
+		verify(encryptionService,times(0)).decryptNote(any(), any(),any());
 	}
 	
 	@Test
 	public void testFilter_withUserGetCal_shouldNotFilter() throws Exception {
 		mockMvc.perform(get("/api/v1/users").contentType(jsonContentType));
-		verify(encryptionService,times(0)).decryptNote(any(), any());
+		verify(encryptionService,times(0)).decryptNote(any(), any(),any());
 	}
 }

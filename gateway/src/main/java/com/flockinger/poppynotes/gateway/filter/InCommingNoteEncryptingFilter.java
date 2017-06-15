@@ -39,20 +39,16 @@ public class InCommingNoteEncryptingFilter extends ZuulFilter {
 	
 	private HttpServletRequest encryptRequest(HttpServletRequest request) {
 		ModifiableHttpServletRequest modifiableRequest = new ModifiableHttpServletRequest(request);
+		Principal principal = request.getUserPrincipal();
+		AuthUserResponse userDetails = userService.getUserInfoFromAuthEmail(principal.getName());
 		
 		try {
-			InputStream encryptedNoteStream = encryptionService.encryptNote(request.getInputStream(), getUserCryptKey(request));
+			InputStream encryptedNoteStream = encryptionService.encryptNote(request.getInputStream(), userDetails.getCryptKey(), principal.getName());
 			modifiableRequest.setInputStream(new SimpleServletInputStream(encryptedNoteStream));
 		} catch (IOException e) {
 			logger.warn("Cannot fetch ServletRequest InputStream!",e);
 		}
 		return modifiableRequest;
-	}
-	
-	private String getUserCryptKey(HttpServletRequest request){
-		Principal principal = request.getUserPrincipal();
-		AuthUserResponse userDetails = userService.getUserInfoFromAuthEmail(principal.getName());
-		return userDetails.getCryptKey();
 	}
 
 	@Override

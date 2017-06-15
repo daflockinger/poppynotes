@@ -44,14 +44,14 @@ public class InCommingNoteEncryptingFilterTest extends EncryptionFilterBaseTest{
 		response.setCryptKey("sikdfyh089oay3i3ip2wr3o2rj3wio8yf");
 		when(userService.getUserInfoFromAuthEmail(matches("daflockinger@gmail.com"))).thenReturn(response);
 		String encryptedMessage = "{\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"pinned\":false,\"archived\":false,\"content\":\"some text\",\"userId\":1}";
-		when(encryptionService.encryptNote(any(), matches(response.getCryptKey())))
+		when(encryptionService.encryptNote(any(), matches(response.getCryptKey()),any()))
 				.thenReturn(new ByteArrayInputStream(encryptedMessage.getBytes()));
 
 		MvcResult result = 
 				mockMvc.perform(post("/api/v1/notes").content(encryptedMessage).contentType(jsonContentType).with(csrf())).andReturn();
 
 		assertEquals("correct response returns 200", 200, result.getResponse().getStatus());
-		verify(encryptionService,times(1)).encryptNote(any(), any());
+		verify(encryptionService,times(1)).encryptNote(any(), any(),any());
 	}
 	
 	@Test
@@ -64,25 +64,25 @@ public class InCommingNoteEncryptingFilterTest extends EncryptionFilterBaseTest{
 		response.setCryptKey("sikdfyh089oay3i3ip2wr3o2rj3wio8yf");
 		when(userService.getUserInfoFromAuthEmail(matches("daflockinger@gmail.com"))).thenReturn(response);
 		String encryptedMessage = "{\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"pinned\":false,\"archived\":false,\"content\":\"some text\",\"userId\":1}";
-		when(encryptionService.encryptNote(any(), matches(response.getCryptKey())))
+		when(encryptionService.encryptNote(any(), matches(response.getCryptKey()),any()))
 				.thenReturn(new ByteArrayInputStream(encryptedMessage.getBytes()));
 
 		MvcResult result = 
 				mockMvc.perform(put("/api/v1/notes").content(encryptedMessage).contentType(jsonContentType).with(csrf())).andReturn();
 
 		assertEquals("correct response returns 200", 200, result.getResponse().getStatus());
-		verify(encryptionService,times(1)).encryptNote(any(), any());
+		verify(encryptionService,times(1)).encryptNote(any(), any(),any());
 	}
 
 	@Test
 	public void testFilter_withNotesGetCall_shouldNotFilter() throws Exception {
 		mockMvc.perform(get("/api/v1/notes/existingNoteId").contentType(jsonContentType));
-		verify(encryptionService,times(0)).encryptNote(any(), any());
+		verify(encryptionService,times(0)).encryptNote(any(), any(),any());
 	}
 	
 	@Test
 	public void testFilter_withUserGetCal_shouldNotFilter() throws Exception {
 		mockMvc.perform(post("/api/v1/users").contentType(jsonContentType).with(csrf()));
-		verify(encryptionService,times(0)).encryptNote(any(), any());
+		verify(encryptionService,times(0)).encryptNote(any(), any(),any());
 	}
 }
