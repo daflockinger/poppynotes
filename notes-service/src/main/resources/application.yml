@@ -41,5 +41,5 @@ spring:
   data:
     mongodb:
       host: localhost
-      port: 27117
+      port: 0
       database: poppynotes

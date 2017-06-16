@@ -47,6 +47,7 @@ public class NoteServiceTest extends BaseDataBaseTest {
 		assertEquals("check last edit date equals", note.getLastEdit(), readNote.getLastEdit());
 		assertEquals("check title equals", note.getTitle(), readNote.getTitle());
 		assertEquals("check user ID equals", note.getUserId(), readNote.getUserId());
+		assertEquals("check init vector equals", note.getInitVector(), readNote.getInitVector());
 	}
 
 	@Test
@@ -61,6 +62,7 @@ public class NoteServiceTest extends BaseDataBaseTest {
 		assertEquals("check last edit date equals", note.getLastEdit(), readNote.getLastEdit());
 		assertEquals("check title equals", note.getTitle(), readNote.getTitle());
 		assertEquals("check user ID equals", note.getUserId(), readNote.getUserId());
+		assertEquals("check init vector equals", note.getInitVector(), readNote.getInitVector());
 	}
 
 	@Test(expected = NoteNotFoundException.class)
@@ -85,8 +87,18 @@ public class NoteServiceTest extends BaseDataBaseTest {
 		newNote.setTitle("Nescio brains an Undead zombies.");
 		newNote.setLastEdit(new Date(0));
 		newNote.setPinned(true);
+		newNote.setInitVector("ikfyakhkjh89oyoi90pf73");
+		newNote.setUserId(3l);
 
 		service.create(newNote);
+		
+		List<OverviewNote> notes = service.findNotesByUserIdPaginated(3l, new PageRequest(0, 10));
+		assertTrue("only one note from user 3", notes.size() == 1);
+		assertEquals("check saved content","Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit​​, morbo vel maleficia?",newNote.getContent());
+		assertEquals("check saved title","Nescio brains an Undead zombies.",newNote.getTitle());
+		assertEquals("check saved last edit date",new Date(0),newNote.getLastEdit());
+		assertTrue("check saved pinned status", newNote.getPinned());
+		assertEquals("check saved initialization vector","ikfyakhkjh89oyoi90pf73",newNote.getInitVector());
 	}
 
 	@Test

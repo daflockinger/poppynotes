@@ -289,7 +289,7 @@ public class ApiContractTest extends BaseContractTest {
 			MockMvcRequestSpecification request = given()
 					.header("userId", "1")
 					.header("Content-Type", "application/json")
-					.body("{\"title\":\"new note\",\"pinned\":true,\"userId\":1,\"archived\":false,\"content\":\"some text\"}");
+					.body("{\"title\":\"new note\",\"pinned\":true,\"userId\":1,\"archived\":false,\"content\":\"some text\",\"initVector\":\"aldk8796\"}");
 
 		// when:
 			ResponseOptions<?> response = given().spec(request)
@@ -310,7 +310,7 @@ public class ApiContractTest extends BaseContractTest {
 			MockMvcRequestSpecification request = given()
 					.header("userId", "1")
 					.header("Content-Type", "application/json")
-					.body("{\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"userId\":1,\"archived\":false,\"content\":\"some text\"}");
+					.body("{\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"userId\":1,\"archived\":false,\"content\":\"some text\",\"initVector\":\"aldk8796\"}");
 
 		// when:
 			ResponseOptions<?> response = given().spec(request)
@@ -331,7 +331,7 @@ public class ApiContractTest extends BaseContractTest {
 			MockMvcRequestSpecification request = given()
 					.header("userId", "1")
 					.header("Content-Type", "application/json")
-					.body("{\"pinned\":true,\"lastEdit\":\"2012-12-12T12:12:12Z\",\"userId\":1,\"archived\":false,\"content\":\"some text\"}");
+					.body("{\"pinned\":true,\"lastEdit\":\"2012-12-12T12:12:12Z\",\"userId\":1,\"archived\":false,\"content\":\"some text\",\"initVector\":\"aldk8796\"}");
 
 		// when:
 			ResponseOptions<?> response = given().spec(request)
@@ -352,7 +352,7 @@ public class ApiContractTest extends BaseContractTest {
 			MockMvcRequestSpecification request = given()
 					.header("userId", "1")
 					.header("Content-Type", "application/json")
-					.body("{\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"pinned\":false,\"archived\":false,\"content\":\"some text\"}");
+					.body("{\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"pinned\":false,\"archived\":false,\"content\":\"some text\",\"initVector\":\"aldk8796\"}");
 
 		// when:
 			ResponseOptions<?> response = given().spec(request)
@@ -368,12 +368,28 @@ public class ApiContractTest extends BaseContractTest {
 	}
 
 	@Test
-	public void validate_apiV1NotesPost_withValidNote_ReturnOKAndStore() throws Exception {
+	public void validate_apiV1NotesPost_withMissingInitVector_ReturnBadRequest() throws Exception {
 		// given:
 			MockMvcRequestSpecification request = given()
 					.header("userId", "1")
 					.header("Content-Type", "application/json")
 					.body("{\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"pinned\":false,\"archived\":false,\"content\":\"some text\",\"userId\":1}");
+
+		// when:
+			ResponseOptions<?> response = given().spec(request)
+					.post("/api/v1/notes");
+
+		// then:
+			assertThat(response.statusCode()).isEqualTo(400);
+	}
+	
+	@Test
+	public void validate_apiV1NotesPost_withValidNote_ReturnOKAndStore() throws Exception {
+		// given:
+			MockMvcRequestSpecification request = given()
+					.header("userId", "1")
+					.header("Content-Type", "application/json")
+					.body("{\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"pinned\":false,\"archived\":false,\"content\":\"some text\",\"userId\":1,\"initVector\":\"aldk8796\"}");
 
 		// when:
 			ResponseOptions<?> response = given().spec(request)
@@ -389,7 +405,7 @@ public class ApiContractTest extends BaseContractTest {
 			MockMvcRequestSpecification request = given()
 					.header("userId", "1")
 					.header("Content-Type", "application/json")
-					.body("{\"title\":\"new note\",\"pinned\":true,\"userId\":1,\"archived\":false,\"content\":\"some text\"}");
+					.body("{\"title\":\"new note\",\"pinned\":true,\"userId\":1,\"archived\":false,\"content\":\"some text\",\"initVector\":\"aldk8796\"}");
 
 		// when:
 			ResponseOptions<?> response = given().spec(request)
@@ -410,7 +426,7 @@ public class ApiContractTest extends BaseContractTest {
 			MockMvcRequestSpecification request = given()
 					.header("userId", "1")
 					.header("Content-Type", "application/json")
-					.body("{\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"userId\":1,\"archived\":false,\"content\":\"some text\"}");
+					.body("{\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"userId\":1,\"archived\":false,\"content\":\"some text\",\"initVector\":\"aldk8796\"}");
 
 		// when:
 			ResponseOptions<?> response = given().spec(request)
@@ -431,7 +447,7 @@ public class ApiContractTest extends BaseContractTest {
 			MockMvcRequestSpecification request = given()
 					.header("userId", "1")
 					.header("Content-Type", "application/json")
-					.body("{\"pinned\":true,\"lastEdit\":\"2012-12-12T12:12:12Z\",\"userId\":1,\"archived\":false,\"content\":\"some text\"}");
+					.body("{\"pinned\":true,\"lastEdit\":\"2012-12-12T12:12:12Z\",\"userId\":1,\"archived\":false,\"content\":\"some text\",\"initVector\":\"aldk8796\"}");
 
 		// when:
 			ResponseOptions<?> response = given().spec(request)
@@ -452,7 +468,7 @@ public class ApiContractTest extends BaseContractTest {
 			MockMvcRequestSpecification request = given()
 					.header("userId", "1")
 					.header("Content-Type", "application/json")
-					.body("{\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"pinned\":false,\"archived\":false,\"content\":\"some text\"}");
+					.body("{\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"pinned\":false,\"archived\":false,\"content\":\"some text\",\"initVector\":\"aldk8796\"}");
 
 		// when:
 			ResponseOptions<?> response = given().spec(request)
@@ -473,7 +489,7 @@ public class ApiContractTest extends BaseContractTest {
 			MockMvcRequestSpecification request = given()
 					.header("userId", "1")
 					.header("Content-Type", "application/json")
-					.body("{\"id\":\"nonExista\",\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"pinned\":false,\"archived\":false,\"content\":\"some text\",\"userId\":1}");
+					.body("{\"id\":\"nonExista\",\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"pinned\":false,\"archived\":false,\"content\":\"some text\",\"userId\":1,\"initVector\":\"aldk8796\"}");
 
 		// when:
 			ResponseOptions<?> response = given().spec(request)
@@ -493,7 +509,7 @@ public class ApiContractTest extends BaseContractTest {
 		// given:
 			MockMvcRequestSpecification request = given()
 					.header("Content-Type", "application/json")
-					.body("{\"id\":\"existingNoteId\",\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"pinned\":false,\"archived\":false,\"content\":\"some text\",\"userId\":1243}");
+					.body("{\"id\":\"existingNoteId\",\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"pinned\":false,\"archived\":false,\"content\":\"some text\",\"userId\":1243,\"initVector\":\"aldk8796\"}");
 
 		// when:
 			ResponseOptions<?> response = given().spec(request)
@@ -514,7 +530,7 @@ public class ApiContractTest extends BaseContractTest {
 			MockMvcRequestSpecification request = given()
 					.header("userId", "1")
 					.header("Content-Type", "application/json")
-					.body("{\"id\":\"existingNoteId\",\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"pinned\":false,\"archived\":false,\"content\":\"some text\",\"userId\":1}");
+					.body("{\"id\":\"existingNoteId\",\"title\":\"new note\",\"lastEdit\":\"2012-12-12T12:12:12Z\",\"pinned\":false,\"archived\":false,\"content\":\"some text\",\"userId\":1,\"initVector\":\"aldk8796\"}");
 
 		// when:
 			ResponseOptions<?> response = given().spec(request)

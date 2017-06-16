@@ -1,121 +1,72 @@
 package com.flockinger.poppynotes.gateway.filter;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import java.io.ByteArrayInputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.context.embedded.LocalServerPort;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.MockReset;
-import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MvcResult;
 
-import com.flockinger.poppynotes.gateway.TestConfig;
-import com.flockinger.poppynotes.gateway.service.NoteEncryptionService;
-import com.google.common.collect.ImmutableList;
+import com.flockinger.poppynotes.gateway.model.AuthUserResponse;
 
-@ActiveProfiles({ "test" })
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@AutoConfigureStubRunner(ids = { "com.flockinger.poppynotes:user-service:+:stubs:8002",
-		"com.flockinger.poppynotes:notes-service:+:stubs:8001" }, workOffline = true)
-@DirtiesContext
-@Import(TestConfig.class)
-public class OutGoingNoteDecryptingFilterTest {
 
-	@MockBean(reset = MockReset.BEFORE)
-	private NoteEncryptionService encryptionService;
-
-	@LocalServerPort
-	int randomServerPort;
-
-	@Qualifier("testRestTemplate")
-	@Autowired
-	RestTemplate restTemplate;
+public class OutGoingNoteDecryptingFilterTest extends EncryptionFilterBaseTest{
+	
+	@Before
+	public void setup() throws Exception {
+		super.mvcSetup();
+		
+		stubResponse = "{\"id\": 2, \"title\": \"1latest\",\"lastEdit\": null, \"archived\": false, \"content\": \"this is a secret message.\"}";
+		notesMock.stubFor(get(urlEqualTo("/api/v1/notes/existingNoteId")).willReturn(aResponse()
+                .withStatus(200).withBody(stubResponse)));
+	}
 
 	@Test
-	public void testFilter_withValidNotesGetCall_shouldReturnDecryptedNote() throws URISyntaxException, InterruptedException {
+	@WithMockUser(username="daflockinger@gmail.com",authorities={"ADMIN","AUTHOR"},password="none")
+	public void testFilter_withValidNotesGetCall_shouldReturnDecryptedNote() throws Exception {
+		AuthUserResponse response = new AuthUserResponse();
+		response.setCryptKey("sikdfyh089oay3i3ip2wr3o2rj3wio8yf");
+		when(userService.getUserInfoFromAuthEmail(matches("daflockinger@gmail.com"))).thenReturn(response);
 		String decryptedSecretMessage = "{\"id\":\"no1\",\"title\":\"top secret\",\"lastEdit\":null,\"archived\":false,\"content\":\"Prosciutto brisket pork turkey filet mignon landjaeger cow.\"}";
-		when(encryptionService.decryptNote(any(), any()))
+		when(encryptionService.decryptNote(any(), matches(response.getCryptKey()),any()))
 				.thenReturn(new ByteArrayInputStream(decryptedSecretMessage.getBytes()));
 
-		MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-		headers.put("userId", ImmutableList.of("1"));
-		headers.put("Content-Type", ImmutableList.of("application/json"));
-		headers.put("Accept-Charset", ImmutableList.of("utf-8"));
-
-		RequestEntity<String> request = new RequestEntity<String>(headers, HttpMethod.GET,
-				new URI("http://localhost:" + randomServerPort + "/api/v1/notes/existingNoteId"));
-
-		ResponseEntity<String> response = restTemplate.exchange(request, String.class);
-
-		assertEquals("correct response returns 200", HttpStatus.OK, response.getStatusCode());
-		assertEquals("check mock-decrypted message", decryptedSecretMessage, response.getBody());
-		verify(encryptionService,times(1)).decryptNote(any(), any());
-	}
-
-	@Test
-	public void testFilter_withNotesPostCall_shouldNotFilter() throws URISyntaxException {		
-		MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-		headers.put("userId", ImmutableList.of("1"));
-		headers.put("Content-Type", ImmutableList.of("application/json"));
-		headers.put("Accept-Charset", ImmutableList.of("utf-8"));
-
-		RequestEntity<String> request = new RequestEntity<String>(headers, HttpMethod.POST,
-				new URI("http://localhost:" + randomServerPort + "/api/v1/notes"));
-		restTemplate.exchange(request, String.class);
-
-		verify(encryptionService,times(0)).decryptNote(any(), any());
+		MvcResult result = 
+		mockMvc.perform(get("/api/v1/notes/existingNoteId").contentType(jsonContentType)).andReturn();
+		
+		assertEquals("correct response returns 200", 200, result.getResponse().getStatus());
+		assertEquals("check mock-decrypted message", decryptedSecretMessage, result.getResponse().getContentAsString());
+		verify(encryptionService,times(1)).decryptNote(any(), matches(response.getCryptKey()),any());
 	}
 	
 	@Test
-	public void testFilter_withNotesPutCall_shouldNotFilter() throws URISyntaxException {
-		MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-		headers.put("userId", ImmutableList.of("1"));
-		headers.put("Content-Type", ImmutableList.of("application/json"));
-		headers.put("Accept-Charset", ImmutableList.of("utf-8"));
-
-		RequestEntity<String> request = new RequestEntity<String>(headers, HttpMethod.PUT,
-				new URI("http://localhost:" + randomServerPort + "/api/v1/notes"));
-		restTemplate.exchange(request, String.class);
-
-		verify(encryptionService,times(0)).decryptNote(any(), any());
+	public void testFilter_withNotesPostCall_shouldNotFilter() throws Exception {		
+		mockMvc.perform(post("/api/v1/notes/existingNoteId").contentType(jsonContentType));
+		verify(encryptionService,times(0)).decryptNote(any(), any(),any());
 	}
 	
 	@Test
-	public void testFilter_withUserGetCal_shouldNotFilter() throws URISyntaxException {
-		MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-		headers.put("userId", ImmutableList.of("1"));
-		headers.put("Content-Type", ImmutableList.of("application/json"));
-		headers.put("Accept-Charset", ImmutableList.of("utf-8"));
-
-		RequestEntity<String> request = new RequestEntity<String>(headers, HttpMethod.GET,
-				new URI("http://localhost:" + randomServerPort + "/api/v1/users"));
-		restTemplate.exchange(request, String.class);
-
-		verify(encryptionService,times(0)).decryptNote(any(), any());
+	public void testFilter_withNotesPutCall_shouldNotFilter() throws Exception {
+		mockMvc.perform(put("/api/v1/notes/existingNoteId").contentType(jsonContentType));
+		verify(encryptionService,times(0)).decryptNote(any(), any(),any());
 	}
 	
+	@Test
+	public void testFilter_withUserGetCal_shouldNotFilter() throws Exception {
+		mockMvc.perform(get("/api/v1/users").contentType(jsonContentType));
+		verify(encryptionService,times(0)).decryptNote(any(), any(),any());
+	}
 }

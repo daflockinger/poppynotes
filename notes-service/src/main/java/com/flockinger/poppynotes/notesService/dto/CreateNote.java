@@ -14,7 +14,7 @@ import io.swagger.annotations.ApiModelProperty;
  */
 
 public class CreateNote {
-	
+
 	@NotNull
 	@JsonProperty("title")
 	private String title = null;
@@ -33,6 +33,24 @@ public class CreateNote {
 	@NotNull
 	@JsonProperty("pinned")
 	private Boolean pinned = null;
+
+	@NotNull
+	@JsonProperty("initVector")
+	private String initVector = null;
+
+	/**
+	 * Initialization Vector (iv) used for message en/decryption
+	 * 
+	 * @return initVector
+	 **/
+	@ApiModelProperty(value = "Initialization Vector (iv) used for message en/decryption")
+	public String getInitVector() {
+		return initVector;
+	}
+
+	public void setInitVector(String initVector) {
+		this.initVector = initVector;
+	}
 
 	public CreateNote title(String title) {
 		this.title = title;
@@ -120,7 +138,8 @@ public class CreateNote {
 		CreateNote createNote = (CreateNote) o;
 		return Objects.equals(this.title, createNote.title) && Objects.equals(this.content, createNote.content)
 				&& Objects.equals(this.userId, createNote.userId) && Objects.equals(this.lastEdit, createNote.lastEdit)
-				&& Objects.equals(this.pinned, createNote.pinned);
+				&& Objects.equals(this.pinned, createNote.pinned)
+				&& Objects.equals(this.initVector, createNote.initVector);
 	}
 
 	@Override
@@ -138,6 +157,7 @@ public class CreateNote {
 		sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
 		sb.append("    lastEdit: ").append(toIndentedString(lastEdit)).append("\n");
 		sb.append("    pinned: ").append(toIndentedString(pinned)).append("\n");
+		sb.append("    initVector: ").append(toIndentedString(initVector)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

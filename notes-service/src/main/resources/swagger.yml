@@ -232,6 +232,9 @@ definitions:
       pinned:
         type: boolean
         description: Pin for important messages to be shown always on top. 
+      initVector:
+        type: string
+        description: Initialization Vector (iv) used for message en/decryption
   UpdateNote:
     type: object
     properties:
@@ -258,6 +261,9 @@ definitions:
       archived:
         type: boolean
         description: Determines if notes is archived and not shown in regular listing (default false).
+      initVector:
+        type: string
+        description: Initialization Vector (iv) used for message en/decryption
   CompleteNote:
     type: object
     properties:
@@ -281,6 +287,9 @@ definitions:
       archived:
         type: boolean
         description: Determines if notes is archived and not shown in regular listing (default false).
+      initVector:
+        type: string
+        description: Initialization Vector (iv) used for message en/decryption
   OverviewNote:
     type: object
     properties:
@@ -303,6 +312,9 @@ definitions:
       archived:
         type: boolean
         description: Determines if notes is archived and not shown in regular listing (default false).
+      initVector:
+        type: string
+        description: Initialization Vector (iv) used for message en/decryption
   Error:
     type: object
     properties:

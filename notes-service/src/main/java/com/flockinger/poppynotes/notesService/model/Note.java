@@ -39,7 +39,18 @@ public class Note {
 	
 	private String content;
 	
+	@NotNull
+	private String initVector;
 	
+	
+	public String getInitVector() {
+		return initVector;
+	}
+
+	public void setInitVector(String initVector) {
+		this.initVector = initVector;
+	}
+
 	public String getId() {
 		return id;
 	}

@@ -1,27 +1,44 @@
 package com.flockinger.poppynotes.gateway.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyVararg;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.net.URI;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
 
 import com.flockinger.poppynotes.gateway.TestConfig;
 import com.flockinger.poppynotes.gateway.exception.UnregisteredUserException;
-import com.flockinger.poppynotes.gateway.exception.UserNotCachedException;
+import com.flockinger.poppynotes.gateway.model.AuthUserResponse;
 import com.flockinger.poppynotes.gateway.model.Role;
 import com.flockinger.poppynotes.gateway.model.Status;
-import com.flockinger.poppynotes.gateway.model.AuthUserResponse;
 import com.flockinger.poppynotes.gateway.service.impl.UserClientServiceImpl;
 
 @ActiveProfiles({"test"})
@@ -37,12 +54,17 @@ public class UserClientServiceTest {
 
 	@Qualifier("testRestTemplate")
 	@Autowired
-	RestTemplate restTemplate;
+	private RestTemplate restTemplate;
+	
+	@Mock
+	private RestTemplate mockTemplate;
 	
 	@Before
 	public void setup() {
 		service.setHost("http://localhost:8001");
 		service.setRestTemplate(restTemplate);
+		
+		service.clearCachedUser("sep@gmail.com");
 	}
 	
 	@Test
@@ -64,30 +86,39 @@ public class UserClientServiceTest {
 		service.getUserInfoFromAuthEmail("nonexista@gmail.com");
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
-	public void testGetCachedUserById_withValidIdAndCachedBefore_shouldReturnCorrectUserInfo() throws UserNotCachedException {
+	public void testCachedRequest_withThreeCalls_shouldReturnCachedOnSecondTime() {
+		reset(mockTemplate);
+		
+		when(mockTemplate.exchange(anyString(), any(HttpMethod.class),any(HttpEntity.class),any(Class.class))).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+
+		service.setRestTemplate(mockTemplate);
+		
 		service.getUserInfoFromAuthEmail("sep@gmail.com");
+		service.getUserInfoFromAuthEmail("sep@gmail.com");
+		service.getUserInfoFromAuthEmail("sep@gmail.com");
+		 
 		
-		AuthUserResponse cachedUser = service.getCachedUserById(2l);
-		
-		assertNotNull("has returned not null", cachedUser);
-		assertEquals("is id correct",2l,cachedUser.getId().longValue());
-		assertEquals("is username correct","sepp",cachedUser.getName());
-		assertEquals("is recovery email correct","sep@gmx.net",cachedUser.getRecoveryEmail());
-		assertEquals("is role correct",Role.AUTHOR,cachedUser.getRoles().iterator().next());
-		assertEquals("is status correct",Status.ACTIVE,cachedUser.getStatus());
-		assertEquals("is cryptkey correct","89768iksgd",cachedUser.getCryptKey());
+		verify(mockTemplate,times(1)).exchange(anyString(), any(HttpMethod.class),any(HttpEntity.class),any(Class.class));
 	}
 	
-	@Test(expected=UserNotCachedException.class)
-	public void testGetCachedUserById_withValidIdButNotCachedBefore_shouldThrowException() throws UserNotCachedException {
-		service.getCachedUserById(4l);
-	}
-	
-	@Test(expected=UserNotCachedException.class)
-	public void testGetCachedUserById_withValidIdButTimedOutCache_shouldThrowException() throws UserNotCachedException, InterruptedException {
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testCachedRequest_withThreeCallsAndClearCache_shouldReallyCallTwoTimes() {
+		reset(mockTemplate);
+		when(mockTemplate.exchange(anyString(), any(HttpMethod.class),any(HttpEntity.class),any(Class.class))).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+		service.setRestTemplate(mockTemplate);
+		
 		service.getUserInfoFromAuthEmail("sep@gmail.com");
-		Thread.sleep(3000);
-		service.getCachedUserById(2l);
+		service.getUserInfoFromAuthEmail("sep@gmail.com");
+		
+		service.clearCachedUser("sep@gmail.com");
+		
+		service.getUserInfoFromAuthEmail("sep@gmail.com");
+		service.getUserInfoFromAuthEmail("sep@gmail.com");
+		service.getUserInfoFromAuthEmail("sep@gmail.com");
+		
+		verify(mockTemplate,times(2)).exchange(anyString(), any(HttpMethod.class),any(HttpEntity.class),any(Class.class));
 	}
 }

@@ -12,7 +12,6 @@ import io.swagger.annotations.ApiModelProperty;
  */
 
 public class OverviewNote {
-
 	@JsonProperty("id")
 	private String id = null;
 
@@ -30,6 +29,9 @@ public class OverviewNote {
 
 	@JsonProperty("archived")
 	private Boolean archived = null;
+
+	@JsonProperty("initVector")
+	private String initVector = null;
 
 	/**
 	 * Unique Identifier of the Note.
@@ -116,6 +118,20 @@ public class OverviewNote {
 		this.archived = archived;
 	}
 
+	/**
+	 * Initialization Vector (iv) used for message en/decryption
+	 * 
+	 * @return initVector
+	 **/
+	@ApiModelProperty(value = "Initialization Vector (iv) used for message en/decryption")
+	public String getInitVector() {
+		return initVector;
+	}
+
+	public void setInitVector(String initVector) {
+		this.initVector = initVector;
+	}
+
 	@Override
 	public boolean equals(java.lang.Object o) {
 		if (this == o) {
@@ -129,12 +145,13 @@ public class OverviewNote {
 				&& Objects.equals(this.partContent, overviewNote.partContent)
 				&& Objects.equals(this.lastEdit, overviewNote.lastEdit)
 				&& Objects.equals(this.pinned, overviewNote.pinned)
-				&& Objects.equals(this.archived, overviewNote.archived);
+				&& Objects.equals(this.archived, overviewNote.archived)
+				&& Objects.equals(this.initVector, overviewNote.initVector);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, title, partContent, lastEdit, pinned, archived);
+		return Objects.hash(id, title, partContent, lastEdit, pinned, archived, initVector);
 	}
 
 	@Override
@@ -148,6 +165,7 @@ public class OverviewNote {
 		sb.append("    lastEdit: ").append(toIndentedString(lastEdit)).append("\n");
 		sb.append("    pinned: ").append(toIndentedString(pinned)).append("\n");
 		sb.append("    archived: ").append(toIndentedString(archived)).append("\n");
+		sb.append("    initVector: ").append(toIndentedString(initVector)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

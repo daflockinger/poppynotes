@@ -1,6 +1,7 @@
 package com.flockinger.poppynotes.gateway.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -18,7 +19,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.flockinger.poppynotes.gateway.exception.UnregisteredUserException;
-import com.flockinger.poppynotes.gateway.exception.UserNotCachedException;
 import com.flockinger.poppynotes.gateway.model.AuthUser;
 import com.flockinger.poppynotes.gateway.model.AuthUserResponse;
 import com.flockinger.poppynotes.gateway.service.UserClientService;
@@ -31,9 +31,7 @@ public class UserClientServiceImpl implements UserClientService {
 	RestTemplate restTemplate;
 	private String host = "http://user-service";
 	
-	
-	@Caching(cacheable={@Cacheable("usersFromEmail")},
-			 put={@CachePut(value="usersForId",key="#result.id")})
+	@Cacheable("usersFromEmail")
 	@Retryable(value={RestClientException.class},
 			   backoff=@Backoff(2000))
 	@Override
@@ -57,10 +55,9 @@ public class UserClientServiceImpl implements UserClientService {
 		return new HttpEntity<AuthUser>(authUser, headers);
 	}
 	
-	@Cacheable("usersForId")
+	@CacheEvict(value={"usersFromEmail"},allEntries=true)
 	@Override
-	public AuthUserResponse getCachedUserById(Long userId) throws UserNotCachedException {
-		throw new UserNotCachedException("User not cached with id: " + userId);
+	public void clearCachedUser(String authEmail) {
 	}
 	
 	public void setHost(String host) {
