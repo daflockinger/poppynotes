@@ -12,10 +12,9 @@ import com.flockinger.poppynotes.notesService.exception.AccessingOtherUsersNotes
 import com.flockinger.poppynotes.notesService.exception.NoteNotFoundException;
 
 public interface NoteService {
-	CompleteNote findNote(String id, Long userId) throws NoteNotFoundException, AccessingOtherUsersNotesException;
-	void create(CreateNote note);
+	CompleteNote findNote(String id, String userHash) throws NoteNotFoundException, AccessingOtherUsersNotesException;
+	CompleteNote create(CreateNote note);
 	void update(UpdateNote note) throws NoteNotFoundException, AccessingOtherUsersNotesException;
-	void delete(String id, Long userId) throws NoteNotFoundException, AccessingOtherUsersNotesException;
-	List<OverviewNote> findNotesByUserIdPaginated(Long userId, Pageable page);
-	List<OverviewNote> findArchivedNotesByUserIdPaginated(Long userId, Pageable page);
+	void delete(String id, String userHash) throws NoteNotFoundException, AccessingOtherUsersNotesException;
+	List<OverviewNote> findNotesByUserHashPaginated(String userHash, Pageable page);
 }

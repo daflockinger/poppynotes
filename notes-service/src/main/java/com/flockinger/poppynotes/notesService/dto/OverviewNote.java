@@ -2,182 +2,179 @@ package com.flockinger.poppynotes.notesService.dto;
 
 import java.util.Date;
 import java.util.Objects;
-
+import javax.validation.Valid;
+import org.springframework.validation.annotation.Validated;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import io.swagger.annotations.ApiModelProperty;
 
 /**
  * OverviewNote
  */
+@Validated
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-10T08:59:41.039Z")
 
-public class OverviewNote {
-	@JsonProperty("id")
-	private String id = null;
+public class OverviewNote   {
+  @JsonProperty("id")
+  private String id = null;
 
-	@JsonProperty("title")
-	private String title = null;
+  @JsonProperty("title")
+  private String title = null;
 
-	@JsonProperty("partContent")
-	private String partContent = null;
+  @JsonProperty("content")
+  private String content = null;
 
-	@JsonProperty("lastEdit")
-	private Date lastEdit = null;
+  @JsonProperty("lastEdit")
+  private Date lastEdit = null;
 
-	@JsonProperty("pinned")
-	private Boolean pinned = null;
+  @JsonProperty("pinned")
+  private Boolean pinned = null;
 
-	@JsonProperty("archived")
-	private Boolean archived = null;
+  public OverviewNote id(String id) {
+    this.id = id;
+    return this;
+  }
 
-	@JsonProperty("initVector")
-	private String initVector = null;
+  /**
+   * Unique Identifier of the Note.
+   * @return id
+  **/
+  @ApiModelProperty(value = "Unique Identifier of the Note.")
 
-	/**
-	 * Unique Identifier of the Note.
-	 * 
-	 * @return id
-	 **/
-	@ApiModelProperty(value = "Unique Identifier of the Note.")
-	public String getId() {
-		return id;
-	}
 
-	public void setId(String id) {
-		this.id = id;
-	}
+  public String getId() {
+    return id;
+  }
 
-	/**
-	 * Title of the Note.
-	 * 
-	 * @return title
-	 **/
-	@ApiModelProperty(value = "Title of the Note.")
-	public String getTitle() {
-		return title;
-	}
+  public void setId(String id) {
+    this.id = id;
+  }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+  public OverviewNote title(String title) {
+    this.title = title;
+    return this;
+  }
 
-	/**
-	 * Only the first lines of the text content.
-	 * 
-	 * @return partContent
-	 **/
-	@ApiModelProperty(value = "Only the first lines of the text content.")
-	public String getPartContent() {
-		return partContent;
-	}
+  /**
+   * Title of the Note.
+   * @return title
+  **/
+  @ApiModelProperty(value = "Title of the Note.")
 
-	public void setPartContent(String partContent) {
-		this.partContent = partContent;
-	}
 
-	/**
-	 * Date the user last edited the note.
-	 * 
-	 * @return lastEdit
-	 **/
-	@ApiModelProperty(value = "Date the user last edited the note.")
-	public Date getLastEdit() {
-		return lastEdit;
-	}
+  public String getTitle() {
+    return title;
+  }
 
-	public void setLastEdit(Date lastEdit) {
-		this.lastEdit = lastEdit;
-	}
+  public void setTitle(String title) {
+    this.title = title;
+  }
 
-	/**
-	 * Pin for important messages to be shown always on top.
-	 * 
-	 * @return pinned
-	 **/
-	@ApiModelProperty(value = "Pin for important messages to be shown always on top.")
-	public Boolean getPinned() {
-		return pinned;
-	}
+  public OverviewNote content(String content) {
+    this.content = content;
+    return this;
+  }
 
-	public void setPinned(Boolean pinned) {
-		this.pinned = pinned;
-	}
+  /**
+   * Text content of the Note (the actual note).
+   * @return content
+  **/
+  @ApiModelProperty(value = "Text content of the Note (the actual note).")
 
-	/**
-	 * Determines if notes is archived and not shown in regular listing (default
-	 * false).
-	 * 
-	 * @return archived
-	 **/
-	@ApiModelProperty(value = "Determines if notes is archived and not shown in regular listing (default false).")
-	public Boolean getArchived() {
-		return archived;
-	}
 
-	public void setArchived(Boolean archived) {
-		this.archived = archived;
-	}
+  public String getContent() {
+    return content;
+  }
 
-	/**
-	 * Initialization Vector (iv) used for message en/decryption
-	 * 
-	 * @return initVector
-	 **/
-	@ApiModelProperty(value = "Initialization Vector (iv) used for message en/decryption")
-	public String getInitVector() {
-		return initVector;
-	}
+  public void setContent(String content) {
+    this.content = content;
+  }
 
-	public void setInitVector(String initVector) {
-		this.initVector = initVector;
-	}
+  public OverviewNote lastEdit(Date lastEdit) {
+    this.lastEdit = lastEdit;
+    return this;
+  }
 
-	@Override
-	public boolean equals(java.lang.Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		OverviewNote overviewNote = (OverviewNote) o;
-		return Objects.equals(this.id, overviewNote.id) && Objects.equals(this.title, overviewNote.title)
-				&& Objects.equals(this.partContent, overviewNote.partContent)
-				&& Objects.equals(this.lastEdit, overviewNote.lastEdit)
-				&& Objects.equals(this.pinned, overviewNote.pinned)
-				&& Objects.equals(this.archived, overviewNote.archived)
-				&& Objects.equals(this.initVector, overviewNote.initVector);
-	}
+  /**
+   * Date the user last edited the note.
+   * @return lastEdit
+  **/
+  @ApiModelProperty(value = "Date the user last edited the note.")
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(id, title, partContent, lastEdit, pinned, archived, initVector);
-	}
+  @Valid
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("class OverviewNote {\n");
+  public Date getLastEdit() {
+    return lastEdit;
+  }
 
-		sb.append("    id: ").append(toIndentedString(id)).append("\n");
-		sb.append("    title: ").append(toIndentedString(title)).append("\n");
-		sb.append("    partContent: ").append(toIndentedString(partContent)).append("\n");
-		sb.append("    lastEdit: ").append(toIndentedString(lastEdit)).append("\n");
-		sb.append("    pinned: ").append(toIndentedString(pinned)).append("\n");
-		sb.append("    archived: ").append(toIndentedString(archived)).append("\n");
-		sb.append("    initVector: ").append(toIndentedString(initVector)).append("\n");
-		sb.append("}");
-		return sb.toString();
-	}
+  public void setLastEdit(Date lastEdit) {
+    this.lastEdit = lastEdit;
+  }
 
-	/**
-	 * Convert the given object to string with each line indented by 4 spaces
-	 * (except the first line).
-	 */
-	private String toIndentedString(java.lang.Object o) {
-		if (o == null) {
-			return "null";
-		}
-		return o.toString().replace("\n", "\n    ");
-	}
+  public OverviewNote pinned(Boolean pinned) {
+    this.pinned = pinned;
+    return this;
+  }
+
+  /**
+   * Pin for important messages to be shown always on top.
+   * @return pinned
+  **/
+  @ApiModelProperty(value = "Pin for important messages to be shown always on top.")
+
+
+  public Boolean isPinned() {
+    return pinned;
+  }
+
+  public void setPinned(Boolean pinned) {
+    this.pinned = pinned;
+  }
+
+
+  @Override
+  public boolean equals(java.lang.Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    OverviewNote overviewNote = (OverviewNote) o;
+    return Objects.equals(this.id, overviewNote.id) &&
+        Objects.equals(this.title, overviewNote.title) &&
+        Objects.equals(this.content, overviewNote.content) &&
+        Objects.equals(this.lastEdit, overviewNote.lastEdit) &&
+        Objects.equals(this.pinned, overviewNote.pinned);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, title, content, lastEdit, pinned);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class OverviewNote {\n");
+    
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    title: ").append(toIndentedString(title)).append("\n");
+    sb.append("    content: ").append(toIndentedString(content)).append("\n");
+    sb.append("    lastEdit: ").append(toIndentedString(lastEdit)).append("\n");
+    sb.append("    pinned: ").append(toIndentedString(pinned)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(java.lang.Object o) {
+    if (o == null) {
+      return "null";
+    }
+    return o.toString().replace("\n", "\n    ");
+  }
 }
+
