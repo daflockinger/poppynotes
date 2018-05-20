@@ -60,7 +60,6 @@ export class CardEditComponent implements OnInit {
   }
 
   encryptAndSaveNote() {
-    // TODO implement encryption
     if (this.note.userHash === undefined) {
       this.note.userHash = this.secretStore.getUserHash();
     }
