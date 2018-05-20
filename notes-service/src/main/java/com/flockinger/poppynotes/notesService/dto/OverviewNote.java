@@ -28,6 +28,31 @@ public class OverviewNote   {
 
   @JsonProperty("pinned")
   private Boolean pinned = null;
+  
+  @JsonProperty("initVector")
+  private String initVector = null;
+  
+  
+
+  /**
+   * Unique Initialization Vector of the Note.
+   * @return initVector
+  **/
+  @ApiModelProperty(value = "Unique Initialization Vector of the Note for encryption.")
+
+
+  public String getInitVector() {
+    return initVector;
+  }
+
+  public void setInitVector(String initVector) {
+    this.initVector = initVector;
+  }
+
+  public OverviewNote initVector(String initVector) {
+    this.initVector = initVector;
+    return this;
+  }
 
   public OverviewNote id(String id) {
     this.id = id;
@@ -141,6 +166,7 @@ public class OverviewNote   {
     }
     OverviewNote overviewNote = (OverviewNote) o;
     return Objects.equals(this.id, overviewNote.id) &&
+        Objects.equals(this.initVector, overviewNote.initVector) &&
         Objects.equals(this.title, overviewNote.title) &&
         Objects.equals(this.content, overviewNote.content) &&
         Objects.equals(this.lastEdit, overviewNote.lastEdit) &&
@@ -149,7 +175,7 @@ public class OverviewNote   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, content, lastEdit, pinned);
+    return Objects.hash(id, title, content, lastEdit, pinned, initVector);
   }
 
   @Override
@@ -158,6 +184,7 @@ public class OverviewNote   {
     sb.append("class OverviewNote {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    initVector: ").append(toIndentedString(initVector)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    content: ").append(toIndentedString(content)).append("\n");
     sb.append("    lastEdit: ").append(toIndentedString(lastEdit)).append("\n");

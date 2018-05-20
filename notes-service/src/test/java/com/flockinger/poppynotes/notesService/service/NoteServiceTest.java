@@ -11,11 +11,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import com.flockinger.poppynotes.notesService.BaseDataBaseTest;
 import com.flockinger.poppynotes.notesService.config.DatabaseConfig;
@@ -24,9 +26,12 @@ import com.flockinger.poppynotes.notesService.dao.NoteRepository;
 import com.flockinger.poppynotes.notesService.dto.CompleteNote;
 import com.flockinger.poppynotes.notesService.dto.CreateNote;
 import com.flockinger.poppynotes.notesService.dto.OverviewNote;
+import com.flockinger.poppynotes.notesService.dto.PinNote;
 import com.flockinger.poppynotes.notesService.dto.UpdateNote;
 import com.flockinger.poppynotes.notesService.exception.AccessingOtherUsersNotesException;
+import com.flockinger.poppynotes.notesService.exception.CantUseInitVectorTwiceException;
 import com.flockinger.poppynotes.notesService.exception.NoteNotFoundException;
+import com.flockinger.poppynotes.notesService.exception.NoteSizeExceededException;
 import com.flockinger.poppynotes.notesService.model.Note;
 import com.flockinger.poppynotes.notesService.service.impl.NotesServiceImpl;
 
@@ -34,6 +39,9 @@ import com.flockinger.poppynotes.notesService.service.impl.NotesServiceImpl;
 @RunWith(SpringRunner.class)
 @DataMongoTest(excludeAutoConfiguration = EmbeddedMongoAutoConfiguration.class)
 @Import({GeneralConfig.class, DatabaseConfig.class})
+@TestPropertySource(properties= {"notes.settings.limits.max-title-length=50",
+    "notes.settings.limits.max-content-length=100",
+    "notes.settings.limits.max-messages-per-user=11"})
 public class NoteServiceTest extends BaseDataBaseTest {
 
   @Autowired
@@ -68,29 +76,93 @@ public class NoteServiceTest extends BaseDataBaseTest {
   }
 
   @Test
-  public void testCreate_withValidEntry_shouldCreate() {
+  public void testCreate_withValidEntry_shouldCreate() throws CantUseInitVectorTwiceException {
     CreateNote newNote = new CreateNote();
     newNote.setContent(
-        "Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit​​, morbo vel maleficia?");
+        "Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. brains morbo vel maleficia?");
     newNote.setTitle("Nescio brains an Undead zombies.");
     newNote.setLastEdit(new Date(0));
     newNote.setUserHash("3");
+    newNote.setInitVector("8888888");
 
     service.create(newNote);
 
     List<OverviewNote> notes = service.findNotesByUserHashPaginated("3", PageRequest.of(0, 10));
     assertTrue("only one note from user 3", notes.size() == 1);
     assertEquals("check saved content",
-        "Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit​​, morbo vel maleficia?",
+        "Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. brains morbo vel maleficia?",
         newNote.getContent());
     assertEquals("check saved title", "Nescio brains an Undead zombies.", notes.get(0).getTitle());
     assertEquals("check saved last edit date", new Date(0), notes.get(0).getLastEdit());
     assertNull("check saved pinned status", notes.get(0).isPinned());
   }
+  
+  @Test(expected=NoteSizeExceededException.class)
+  public void testCreate_withTooLongTitle_shouldThrowException() throws CantUseInitVectorTwiceException {
+    CreateNote newNote = new CreateNote();
+    newNote.setContent(
+        "Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. brains morbo vel maleficia?");
+    newNote.setTitle("Nescio brains an Undead zombies.an Undead zombiies.");
+    newNote.setLastEdit(new Date(0));
+    newNote.setUserHash("3");
+    newNote.setInitVector("8888888");
+
+    service.create(newNote);
+  }
+  
+  @Test(expected=NoteSizeExceededException.class)
+  public void testCreate_withTooLongContent_shouldThrowException() throws CantUseInitVectorTwiceException {
+    CreateNote newNote = new CreateNote();
+    newNote.setContent(
+        "Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. brains morbo vel maleficia????");
+    newNote.setTitle("Nescio brains an Undead zombies.");
+    newNote.setLastEdit(new Date(0));
+    newNote.setUserHash("3");
+    newNote.setInitVector("8888888");
+
+    service.create(newNote);
+  }
+  
+  @Test(expected=NoteSizeExceededException.class)
+  public void testCreate_withMaxEntriesEachedPerUser_shouldThrowException() throws CantUseInitVectorTwiceException {
+    CreateNote newNote = new CreateNote();
+    newNote.setContent(
+        "Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. brains morbo vel maleficia?");
+    newNote.setTitle("Nescio brains an Undead zombies.");
+    newNote.setLastEdit(new Date(0));
+    newNote.setUserHash("1");
+    newNote.setInitVector("8888888");
+
+    service.create(newNote);
+    
+    CreateNote newNote2 = new CreateNote();
+    newNote2.setContent(
+        "Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. brains morbo vel maleficia?");
+    newNote2.setTitle("Nescio brains an Undead zombies.");
+    newNote2.setLastEdit(new Date(0));
+    newNote2.setUserHash("1");
+    newNote2.setInitVector("8887778");
+
+    service.create(newNote2);
+  }
+
+  @Test(expected = CantUseInitVectorTwiceException.class)
+  public void testCreate_withAlreadyUsedInitVector_shouldThrowException()
+      throws CantUseInitVectorTwiceException {
+    CreateNote newNote = new CreateNote();
+    newNote.setContent(
+        "Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. brains morbo vel maleficia?");
+    newNote.setTitle("Nescio brains an Undead zombies.");
+    newNote.setLastEdit(new Date(0));
+    newNote.setInitVector("4321");
+    newNote.setUserHash("1");
+
+    service.create(newNote);
+  }
 
   @Test
-  public void testUpdate_withValidUpdate_shouldUpdate()
-      throws NoteNotFoundException, AccessingOtherUsersNotesException {
+  public void testUpdate_withValidUpdate_shouldUpdate() throws NoteNotFoundException,
+      AccessingOtherUsersNotesException, CantUseInitVectorTwiceException {
     UpdateNote update = new UpdateNote();
     update.setId(dao.findAll().stream().findFirst().get().getId());
     update.setContent(
@@ -99,6 +171,7 @@ public class NoteServiceTest extends BaseDataBaseTest {
     update.setLastEdit(new Date(0));
     update.setPinned(false);
     update.setUserHash("1");
+    update.setInitVector("99999999");
 
     service.update(update);
 
@@ -109,10 +182,59 @@ public class NoteServiceTest extends BaseDataBaseTest {
     assertEquals("check updated title", updatedNote.getTitle(), update.getTitle());
     assertEquals("check unchanged userId", updatedNote.getUserHash(), update.getUserHash());
   }
+  
+  @Test(expected=NoteSizeExceededException.class)
+  public void testUpdate_withTooLongTitle_shouldThrowException() throws NoteNotFoundException,
+      AccessingOtherUsersNotesException, CantUseInitVectorTwiceException {
+    UpdateNote update = new UpdateNote();
+    update.setId(dao.findAll().stream().findFirst().get().getId());
+    update.setContent(
+        "De braaaiiiins apocalypsi gorger omero prefrontal cortex undead survivor fornix dictum mauris. ");
+    update.setTitle("Nigh basal ganglia tofth eliv ingdead. Zombiiieee!!");
+    update.setLastEdit(new Date(0));
+    update.setPinned(false);
+    update.setUserHash("1");
+    update.setInitVector("99999999");
+
+    service.update(update);
+  }
+  
+  @Test(expected=NoteSizeExceededException.class)
+  public void testUpdate_withTooLongContent_shouldThrowException() throws NoteNotFoundException,
+      AccessingOtherUsersNotesException, CantUseInitVectorTwiceException {
+    UpdateNote update = new UpdateNote();
+    update.setId(dao.findAll().stream().findFirst().get().getId());
+    update.setContent(
+        "De braaaiiiins apocalypsi gorger omero prefrontal cortex undead survivor fornix dictum mauris. Braaaiiiins!");
+    update.setTitle("Nigh basal ganglia tofth eliv ingdead.");
+    update.setLastEdit(new Date(0));
+    update.setPinned(false);
+    update.setUserHash("1");
+    update.setInitVector("99999999");
+
+    service.update(update);
+  }
+
+  @Test(expected = CantUseInitVectorTwiceException.class)
+  public void testUpdate_withAlreadyExistingInitVector_shouldThrowException()
+      throws NoteNotFoundException, AccessingOtherUsersNotesException,
+      CantUseInitVectorTwiceException {
+    UpdateNote update = new UpdateNote();
+    update.setId(dao.findAll().stream().findFirst().get().getId());
+    update.setContent(
+        "De braaaiiiins apocalypsi gorger omero prefrontal cortex undead survivor fornix dictum mauris. ");
+    update.setTitle("Nigh basal ganglia tofth eliv ingdead.");
+    update.setLastEdit(new Date(0));
+    update.setPinned(false);
+    update.setInitVector("4321");
+    update.setUserHash("1");
+
+    service.update(update);
+  }
 
   @Test(expected = NoteNotFoundException.class)
-  public void testUpdate_withNonExistingEntry_shouldThrowException()
-      throws NoteNotFoundException, AccessingOtherUsersNotesException {
+  public void testUpdate_withNonExistingEntry_shouldThrowException() throws NoteNotFoundException,
+      AccessingOtherUsersNotesException, CantUseInitVectorTwiceException {
     UpdateNote update = new UpdateNote();
     update.setId("nonExista");
     update.setContent(
@@ -127,7 +249,8 @@ public class NoteServiceTest extends BaseDataBaseTest {
 
   @Test(expected = AccessingOtherUsersNotesException.class)
   public void testUpdate_withCorrectIdButWrongUser_shouldThrowException()
-      throws NoteNotFoundException, AccessingOtherUsersNotesException {
+      throws NoteNotFoundException, AccessingOtherUsersNotesException,
+      CantUseInitVectorTwiceException {
     UpdateNote update = new UpdateNote();
     update.setId(dao.findAll().stream().findFirst().get().getId());
     update.setContent(
@@ -143,10 +266,10 @@ public class NoteServiceTest extends BaseDataBaseTest {
   @Test
   public void testDelete_withValidIdAndUserId_shouldDelete()
       throws NoteNotFoundException, AccessingOtherUsersNotesException {
-    String id = dao.findAll().stream().findFirst().get().getId();
-    service.delete(id, "1");
+    Note noteToDelete = dao.findAll().stream().findFirst().get();
+    service.delete(noteToDelete.getId(), noteToDelete.getUserHash());
 
-    assertFalse("deleted note should not exist anymore", dao.existsById(id));
+    assertFalse("deleted note should not exist anymore", dao.existsById(noteToDelete.getId()));
   }
 
   @Test(expected = AccessingOtherUsersNotesException.class)
@@ -188,4 +311,38 @@ public class NoteServiceTest extends BaseDataBaseTest {
     assertNotNull("should not be null", notes);
     assertTrue("from user with no notes, should be empty", notes.size() == 0);
   }
+  
+  @Test
+  public void testPinNote_withValidPinRequest_shouldPinCorrectly() throws NoteNotFoundException, AccessingOtherUsersNotesException {
+    Note unpinnedNote = dao.findAll().stream().filter(note -> !note.getPinned()).findFirst().get();
+    PinNote request = new PinNote();
+    request.setNoteId(unpinnedNote.getId());
+    request.setPinIt(true);
+    
+    service.pinNote(request, unpinnedNote.getUserHash());
+    
+    Note maybePinned = dao.findById(unpinnedNote.getId()).get();
+    assertEquals("verify that note was pinned", true, maybePinned.getPinned());
+  }
+  
+  @Test(expected=NoteNotFoundException.class)
+  public void testPinNote_withNotExistingUserId_shouldThrowException() throws NoteNotFoundException, AccessingOtherUsersNotesException {
+    Note unpinnedNote = dao.findAll().stream().filter(note -> !note.getPinned()).findFirst().get();
+    PinNote request = new PinNote();
+    request.setNoteId("NONEXISTANTE");
+    request.setPinIt(true);
+    
+    service.pinNote(request, unpinnedNote.getUserHash());
+  }
+  
+  @Test(expected=AccessingOtherUsersNotesException.class)
+  public void testPinNote_withNotCorrectIdButWrongUser_shouldThrowException() throws NoteNotFoundException, AccessingOtherUsersNotesException {
+    Note unpinnedNote = dao.findAll().stream().filter(note -> !note.getPinned()).findFirst().get();
+    PinNote request = new PinNote();
+    request.setNoteId(unpinnedNote.getId());
+    request.setPinIt(true);
+    
+    service.pinNote(request, "hACkeR");
+  }
+  
 }

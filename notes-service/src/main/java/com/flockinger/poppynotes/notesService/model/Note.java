@@ -33,10 +33,19 @@ public class Note {
 
   @NotNull
   private String title;
-
+  
+  private String initVector;
 
   private String content;
 
+
+  public String getInitVector() {
+    return initVector;
+  }
+
+  public void setInitVector(String initVector) {
+    this.initVector = initVector;
+  }
 
   public String getUserHash() {
     return userHash;

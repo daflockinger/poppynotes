@@ -20,7 +20,16 @@ springfox:
         
 notes:
   security:
-    allowed-origin: http://localhost:8001
+    allowed-origin: http://localhost:4200
+  rate-limit:
+    time-range-minutes: 1
+    call-limit: 10
+  settings:
+    limits:
+      max-title-length: 50
+      max-content-length: 1000
+      max-messages-per-user: 1000
+    user-whitelist-enabled: true
     
     
 #### Test Profile
@@ -31,4 +40,5 @@ spring:
     mongodb:
       host: localhost
       port: 27017
-      database: testpoppynotes
+      database: testpoppynotes     
+      

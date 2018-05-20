@@ -12,6 +12,7 @@ public class TestDataFactory {
 		Note note1 = new Note();
 		note1.setUserHash("1");
 		note1.setLastEdit(new Date(100));
+		note1.setInitVector("4321");
 		note1.setTitle(
 				"oldest-non-pinned. Capicola kevin ham hock, pancetta ribeye beef ribs short loin pork loin sirloin tail pig porchetta boudin. Chuck porchetta meatloaf, beef ham swine tenderloin tail.");
 		note1.setContent(

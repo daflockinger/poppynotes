@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.flockinger.poppynotes.notesService.dto.CompleteNote;
 import com.flockinger.poppynotes.notesService.dto.CreateNote;
 import com.flockinger.poppynotes.notesService.dto.OverviewNote;
+import com.flockinger.poppynotes.notesService.dto.PinNote;
 import com.flockinger.poppynotes.notesService.dto.UpdateNote;
 import com.flockinger.poppynotes.notesService.exception.AccessingOtherUsersNotesException;
+import com.flockinger.poppynotes.notesService.exception.CantUseInitVectorTwiceException;
 import com.flockinger.poppynotes.notesService.exception.DtoValidationFailedException;
 import com.flockinger.poppynotes.notesService.exception.NoteNotFoundException;
 import com.flockinger.poppynotes.notesService.service.NoteService;
@@ -30,7 +32,9 @@ public class NotesApiController implements NotesApi {
 
 
   @Override
-  public ResponseEntity<CompleteNote> createNote(@Valid @RequestBody CreateNote noteCreate) {
+  public ResponseEntity<CompleteNote> createNote(@Valid @RequestBody CreateNote noteCreate,
+      @RequestHeader(value = "userId", required = true) String userId)
+      throws CantUseInitVectorTwiceException {
     CompleteNote note = service.create(noteCreate);
     return new ResponseEntity<CompleteNote>(note, HttpStatus.CREATED);
   }
@@ -73,9 +77,19 @@ public class NotesApiController implements NotesApi {
   }
 
   @Override
-  public ResponseEntity<Void> updateNote(@Valid @RequestBody UpdateNote noteUpdate)
-      throws NoteNotFoundException, AccessingOtherUsersNotesException {
+  public ResponseEntity<Void> updateNote(@Valid @RequestBody UpdateNote noteUpdate,
+      @RequestHeader(value = "userId", required = true) String userId) throws NoteNotFoundException,
+      AccessingOtherUsersNotesException, CantUseInitVectorTwiceException {
     service.update(noteUpdate);
+    return new ResponseEntity<Void>(HttpStatus.OK);
+  }
+
+  public ResponseEntity<Void> pinNote(
+      @ApiParam(value = "", required = true) @Valid @RequestBody PinNote pinNote,
+      @ApiParam(value = "Unique Identifier of the User requesting his notes.",
+          required = true) @RequestHeader(value = "userId", required = true) String userId)
+      throws NoteNotFoundException, AccessingOtherUsersNotesException {
+    service.pinNote(pinNote, userId);
     return new ResponseEntity<Void>(HttpStatus.OK);
   }
 

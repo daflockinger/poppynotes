@@ -31,6 +31,12 @@ parameters:
     schema:
       $ref: '#/definitions/UpdateNote'
     required: true
+  PinNote:
+    name: pin-note
+    in: body
+    schema: 
+      $ref: '#/definitions/PinNote'
+    required: true
   IdUser:
     name: userId
     in: header
@@ -94,6 +100,7 @@ paths:
       operationId: createNote
       parameters:
         - $ref: '#/parameters/NoteCreate'
+        - $ref: '#/parameters/IdUser'
       tags: 
         - Notes
       responses:
@@ -125,11 +132,43 @@ paths:
       operationId: updateNote
       parameters:
         - $ref: '#/parameters/NoteUpdate'
+        - $ref: '#/parameters/IdUser'
       tags: 
         - Notes
       responses:
         200:
           description: Note updated.
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
+  /api/v1/notes/pin: 
+    put:
+      summary: Pin Note
+      description: Pin a Note.
+      operationId: pinNote
+      parameters:
+        - $ref: '#/parameters/PinNote'
+        - $ref: '#/parameters/IdUser'
+      tags: 
+        - Notes
+      responses:
+        200:
+          description: Note pinned/unpinned.
         400:
           description: Bad request (validation failed).
           schema:
@@ -212,6 +251,15 @@ paths:
         500:
           description: Internal Server Error.
 definitions:
+  PinNote:
+    type: object
+    properties:
+      pinIt:
+        type: boolean
+        description: Boolean if the note should be set pinned or not
+      noteId:
+        type: string
+        description: Unique Identifier of the Note.
   CreateNote:
     type: object
     properties:

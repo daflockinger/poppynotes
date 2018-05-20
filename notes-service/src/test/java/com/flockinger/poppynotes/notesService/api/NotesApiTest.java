@@ -15,7 +15,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.io.IOException;
 import java.util.Date;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,79 +30,94 @@ import com.flockinger.poppynotes.notesService.config.SecurityConfig;
 import com.flockinger.poppynotes.notesService.config.WebConfig;
 import com.flockinger.poppynotes.notesService.dto.CompleteNote;
 import com.flockinger.poppynotes.notesService.dto.CreateNote;
+import com.flockinger.poppynotes.notesService.dto.PinNote;
 import com.flockinger.poppynotes.notesService.dto.UpdateNote;
 import com.flockinger.poppynotes.notesService.exception.AccessingOtherUsersNotesException;
+import com.flockinger.poppynotes.notesService.exception.CantUseInitVectorTwiceException;
 import com.flockinger.poppynotes.notesService.exception.NoteNotFoundException;
 import com.flockinger.poppynotes.notesService.service.NoteService;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest
-@Import({WebConfig.class, SecurityConfig.class})
+@Import({WebConfig.class, SecurityConfig.class, RateLimitInterceptor.class})
 public class NotesApiTest extends BaseControllerTest {
 
   @Autowired
   private MockMvc mockMvc;
-  
+
   @MockBean
   private NoteService service;
+  
+  @MockBean
+  private RateLimitInterceptor mockCopter;
+
+  @Before
+  public void setup() throws Exception {
+    when(mockCopter.preHandle(any(), any(), any())).thenReturn(true);
+  }
   
   @Test
   public void testGetNote_withCorrectIdAndUser_shouldReturnCorrect() throws Exception {
     CompleteNote note = new CompleteNote();
     note.setContent("fake something");
     when(service.findNote(anyString(), anyString())).thenReturn(note);
-    
+
     mockMvc.perform(get("/api/v1/notes/2").contentType(jsonContentType).header("userId", "1234"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.content", is("fake something")));
-    
+        .andExpect(status().isOk()).andExpect(jsonPath("$.content", is("fake something")));
+
     verify(service).findNote(matches("2"), matches("1234"));
   }
-  
+
   @Test
   public void testGetNote_withNotExistingIdAndUser_shouldReturNotFound() throws Exception {
     when(service.findNote(anyString(), anyString())).thenThrow(NoteNotFoundException.class);
-    
-    mockMvc.perform(get("/api/v1/notes/999").contentType(jsonContentType).header("userId", "nONExistante"))
+
+    mockMvc
+        .perform(
+            get("/api/v1/notes/999").contentType(jsonContentType).header("userId", "nONExistante"))
         .andExpect(status().isNotFound());
   }
-  
+
   @Test
   public void testGetNote_withIdNotBelongingToUser_shouldReturConflict() throws Exception {
-    when(service.findNote(anyString(), anyString())).thenThrow(AccessingOtherUsersNotesException.class);
-    
-    mockMvc.perform(get("/api/v1/notes/999").contentType(jsonContentType).header("userId", "nONExistante"))
+    when(service.findNote(anyString(), anyString()))
+        .thenThrow(AccessingOtherUsersNotesException.class);
+
+    mockMvc
+        .perform(
+            get("/api/v1/notes/999").contentType(jsonContentType).header("userId", "nONExistante"))
         .andExpect(status().isForbidden());
   }
-  
-  
+
+
   @Test
   public void testDeleteNote_withExistingIdAndUser_shouldReturnCorrect() throws Exception {
     doNothing().when(service).delete(anyString(), anyString());
-    
-    mockMvc.perform(delete("/api/v1/notes/1").contentType(jsonContentType).header("userId", "1234").with(csrf()))
-        .andExpect(status().isOk());
-    
+
+    mockMvc.perform(delete("/api/v1/notes/1").contentType(jsonContentType).header("userId", "1234")
+        ).andExpect(status().isOk());
+
     verify(service).delete(matches("1"), matches("1234"));
   }
-  
-  
+
+
   @Test
   public void testDeleteNote_withNotExistingIdAndUser_shouldReturnCorrect() throws Exception {
     doThrow(NoteNotFoundException.class).when(service).delete(anyString(), anyString());
-    
-    mockMvc.perform(delete("/api/v1/notes/999").contentType(jsonContentType).header("userId", "nONExistante").with(csrf()))
-        .andExpect(status().isNotFound());
+
+    mockMvc.perform(delete("/api/v1/notes/999").contentType(jsonContentType)
+        .header("userId", "nONExistante")).andExpect(status().isNotFound());
   }
-  
+
   @Test
   public void testDeleteNote_withIdNotBelongingToUser_shouldReturnForbidden() throws Exception {
     doThrow(AccessingOtherUsersNotesException.class).when(service).delete(anyString(), anyString());
-    
-    mockMvc.perform(delete("/api/v1/notes/999").contentType(jsonContentType).header("userId", "nONExistante"))
+
+    mockMvc.perform(
+        delete("/api/v1/notes/999").contentType(jsonContentType).header("userId", "nONExistante"))
         .andExpect(status().isForbidden());
   }
-  
+
   @Test
   public void testCreateNote_withValidFreshNote_shouldCreate() throws Exception {
     CreateNote note = new CreateNote();
@@ -108,86 +125,128 @@ public class NotesApiTest extends BaseControllerTest {
     note.setLastEdit(new Date());
     note.setTitle("DIY. Distillery banjo");
     note.setUserHash("12345");
-    
+    note.setInitVector("87268473");
+
     CompleteNote complete = new CompleteNote();
     complete.setId("2");
     when(service.create(any())).thenReturn(complete);
-    
-    mockMvc.perform(post("/api/v1/notes").contentType(jsonContentType).content(json(note)).with(csrf()))
-        .andExpect(jsonPath("$.id", is("2")))
-        .andExpect(status().isCreated());
+
+    mockMvc
+        .perform(
+            post("/api/v1/notes").contentType(jsonContentType).content(json(note)).header("userId", "1234"))
+        .andExpect(jsonPath("$.id", is("2"))).andExpect(status().isCreated());
   }
-  
+
+  @Test
+  public void testCreateNote_withExistingInitVector_shouldReturnForbidden() throws Exception {
+    CreateNote note = new CreateNote();
+    note.setContent("Flexitarian offal locavore unicorn hammock banh mi single-origin coffee ");
+    note.setLastEdit(new Date());
+    note.setTitle("DIY. Distillery banjo");
+    note.setUserHash("1");
+    note.setInitVector("4321");
+
+    CompleteNote complete = new CompleteNote();
+    complete.setId("2");
+    when(service.create(any())).thenThrow(CantUseInitVectorTwiceException.class);
+
+    mockMvc
+        .perform(
+            post("/api/v1/notes").contentType(jsonContentType).content(json(note)).header("userId", "1234"))
+        .andExpect(status().isForbidden());
+  }
+
   @Test
   public void testCreateNote_withNoteMissingUserHash_shouldReturnBadRequest() throws Exception {
     CreateNote note = new CreateNote();
     note.setContent("Flexitarian offal locavore unicorn hammock banh mi single-origin coffee ");
     note.setLastEdit(new Date());
     note.setTitle("DIY. Distillery banjo");
-    
+    note.setInitVector("87268473");
+
     CompleteNote complete = new CompleteNote();
     complete.setId("2");
     when(service.create(any())).thenReturn(complete);
-    
-    mockMvc.perform(post("/api/v1/notes").contentType(jsonContentType).content(json(note)).with(csrf()))
+
+    mockMvc
+        .perform(
+            post("/api/v1/notes").contentType(jsonContentType).content(json(note)))
         .andExpect(status().isBadRequest());
   }
-  
+
   @Test
   public void testCreateNote_withNoteMissingTitle_shouldReturnBadRequest() throws Exception {
     CreateNote note = new CreateNote();
     note.setContent("Flexitarian offal locavore unicorn hammock banh mi single-origin coffee ");
     note.setLastEdit(new Date());
     note.setUserHash("12345");
-    
+    note.setInitVector("87268473");
+
     CompleteNote complete = new CompleteNote();
     complete.setId("2");
     when(service.create(any())).thenReturn(complete);
-    
-    mockMvc.perform(post("/api/v1/notes").contentType(jsonContentType).content(json(note)).with(csrf()))
+
+    mockMvc
+        .perform(
+            post("/api/v1/notes").contentType(jsonContentType).content(json(note)))
         .andExpect(status().isBadRequest());
   }
-  
+
   @Test
   public void testCreateNote_withNoteMissingLastEdit_shouldReturnBadRequest() throws Exception {
     CreateNote note = new CreateNote();
     note.setContent("Flexitarian offal locavore unicorn hammock banh mi single-origin coffee ");
     note.setTitle("DIY. Distillery banjo");
     note.setUserHash("12345");
-    
+    note.setInitVector("87268473");
+
     CompleteNote complete = new CompleteNote();
     complete.setId("2");
     when(service.create(any())).thenReturn(complete);
-    
-    mockMvc.perform(post("/api/v1/notes").contentType(jsonContentType).content(json(note)).with(csrf()))
+
+    mockMvc
+        .perform(
+            post("/api/v1/notes").contentType(jsonContentType).content(json(note)))
         .andExpect(status().isBadRequest());
   }
-  
+
   @Test
   public void testCreateNote_withNoteMissingContent_shouldReturnBadRequest() throws Exception {
     CreateNote note = new CreateNote();
     note.setLastEdit(new Date());
     note.setTitle("DIY. Distillery banjo");
     note.setUserHash("12345");
-    
+    note.setInitVector("87268473");
+
     CompleteNote complete = new CompleteNote();
     complete.setId("2");
     when(service.create(any())).thenReturn(complete);
-    
-    mockMvc.perform(post("/api/v1/notes").contentType(jsonContentType).content(json(note)).with(csrf()))
+
+    mockMvc
+        .perform(
+            post("/api/v1/notes").contentType(jsonContentType).content(json(note)))
         .andExpect(status().isBadRequest());
   }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
+  @Test
+  public void testCreateNote_withNoteMissingInitVector_shouldReturnBadRequest() throws Exception {
+    CreateNote note = new CreateNote();
+    note.setLastEdit(new Date());
+    note.setTitle("DIY. Distillery banjo");
+    note.setUserHash("12345");
+    note.setContent("bla blu");
+
+    CompleteNote complete = new CompleteNote();
+    complete.setId("2");
+    when(service.create(any())).thenReturn(complete);
+
+    mockMvc
+        .perform(
+            post("/api/v1/notes").contentType(jsonContentType).content(json(note)))
+        .andExpect(status().isBadRequest());
+  }
+
+
   @Test
   public void testUpdateNote_withValidFreshNote_shouldUpdate() throws Exception {
     UpdateNote note = new UpdateNote();
@@ -196,15 +255,17 @@ public class NotesApiTest extends BaseControllerTest {
     note.setLastEdit(new Date());
     note.setTitle("DIY. Distillery banjo");
     note.setUserHash("12345");
-    
+    note.setInitVector("87268473");
+
     CompleteNote complete = new CompleteNote();
     complete.setId("2");
     when(service.create(any())).thenReturn(complete);
-    
-    mockMvc.perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)).with(csrf()))
+
+    mockMvc
+        .perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)).header("userId", "1234"))
         .andExpect(status().isOk());
   }
-  
+
   @Test
   public void testUpdateNote_withNoteMissingUserHash_shouldReturnBadRequest() throws Exception {
     UpdateNote note = new UpdateNote();
@@ -212,15 +273,17 @@ public class NotesApiTest extends BaseControllerTest {
     note.setContent("Flexitarian offal locavore unicorn hammock banh mi single-origin coffee ");
     note.setLastEdit(new Date());
     note.setTitle("DIY. Distillery banjo");
-    
+    note.setInitVector("87268473");
+
     CompleteNote complete = new CompleteNote();
     complete.setId("2");
     doNothing().when(service).update(any());
-    
-    mockMvc.perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)).with(csrf()))
+
+    mockMvc
+        .perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)))
         .andExpect(status().isBadRequest());
   }
-  
+
   @Test
   public void testUpdateNote_withNoteMissingTitle_shouldReturnBadRequest() throws Exception {
     UpdateNote note = new UpdateNote();
@@ -228,15 +291,17 @@ public class NotesApiTest extends BaseControllerTest {
     note.setLastEdit(new Date());
     note.setUserHash("12345");
     note.setId("123");
-    
+    note.setInitVector("87268473");
+
     CompleteNote complete = new CompleteNote();
     complete.setId("2");
     doNothing().when(service).update(any());
-    
-    mockMvc.perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)).with(csrf()))
+
+    mockMvc
+        .perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)))
         .andExpect(status().isBadRequest());
   }
-  
+
   @Test
   public void testUpdateNote_withNoteMissingLastEdit_shouldReturnBadRequest() throws Exception {
     UpdateNote note = new UpdateNote();
@@ -244,15 +309,17 @@ public class NotesApiTest extends BaseControllerTest {
     note.setTitle("DIY. Distillery banjo");
     note.setUserHash("12345");
     note.setId("123");
-    
+    note.setInitVector("87268473");
+
     CompleteNote complete = new CompleteNote();
     complete.setId("2");
     doNothing().when(service).update(any());
-    
-    mockMvc.perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)).with(csrf()))
+
+    mockMvc
+        .perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)))
         .andExpect(status().isBadRequest());
   }
-  
+
   @Test
   public void testUpdateNote_withNoteMissingContent_shouldReturnBadRequest() throws Exception {
     UpdateNote note = new UpdateNote();
@@ -260,15 +327,17 @@ public class NotesApiTest extends BaseControllerTest {
     note.setTitle("DIY. Distillery banjo");
     note.setUserHash("12345");
     note.setId("123");
-    
+    note.setInitVector("87268473");
+
     CompleteNote complete = new CompleteNote();
     complete.setId("2");
     doNothing().when(service).update(any());
-    
-    mockMvc.perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)).with(csrf()))
+
+    mockMvc
+        .perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)))
         .andExpect(status().isBadRequest());
   }
-  
+
   @Test
   public void testUpdateNote_withNoteMissingId_shouldReturnBadRequest() throws Exception {
     UpdateNote note = new UpdateNote();
@@ -276,33 +345,73 @@ public class NotesApiTest extends BaseControllerTest {
     note.setTitle("DIY. Distillery banjo");
     note.setUserHash("12345");
     note.setContent("Small batch Distillery");
-    
+    note.setInitVector("87268473");
+
     CompleteNote complete = new CompleteNote();
     complete.setId("2");
     doNothing().when(service).update(any());
-    
-    mockMvc.perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)).with(csrf()))
+
+    mockMvc
+        .perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)))
         .andExpect(status().isBadRequest());
   }
-  
+
   @Test
-  public void testUpdateNote_withNoteOfWrongUserNotOwningNote_shouldReturnForbidden() throws Exception {
+  public void testUpdateNote_withNoteMissingInitVector_shouldReturnBadRequest() throws Exception {
+    UpdateNote note = new UpdateNote();
+    note.setLastEdit(new Date());
+    note.setTitle("DIY. Distillery banjo");
+    note.setUserHash("12345");
+    note.setContent("Small batch Distillery");
+    note.setId("1");
+
+    CompleteNote complete = new CompleteNote();
+    complete.setId("2");
+    doNothing().when(service).update(any());
+
+    mockMvc
+        .perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testUpdateNote_withNoteOfWrongUserNotOwningNote_shouldReturnForbidden()
+      throws Exception {
     UpdateNote note = new UpdateNote();
     note.setId("123");
     note.setContent("Flexitarian offal locavore unicorn hammock banh mi single-origin coffee ");
     note.setLastEdit(new Date());
     note.setTitle("DIY. Distillery banjo");
     note.setUserHash("HACKER");
-    
+    note.setInitVector("87268473");
+
     CompleteNote complete = new CompleteNote();
     complete.setId("2");
     doThrow(AccessingOtherUsersNotesException.class).when(service).update(any());
-    
-    mockMvc.perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)))
+
+    mockMvc.perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)).header("userId", "1234"))
         .andExpect(status().isForbidden());
   }
-  
-  
+
+  @Test
+  public void testUpdateNote_withExistingInitVector_shouldReturnForbidden() throws Exception {
+    UpdateNote note = new UpdateNote();
+    note.setId("123");
+    note.setContent("Flexitarian offal locavore unicorn hammock banh mi single-origin coffee ");
+    note.setLastEdit(new Date());
+    note.setTitle("DIY. Distillery banjo");
+    note.setUserHash("1");
+    note.setInitVector("4321");
+
+    CompleteNote complete = new CompleteNote();
+    complete.setId("2");
+    doThrow(CantUseInitVectorTwiceException.class).when(service).update(any());
+    
+    mockMvc
+        .perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)).header("userId", "1234"))
+        .andExpect(status().isForbidden());
+  }
+
   @Test
   public void testUpdateNote_withNoteNotExisting_shouldReturnNotFound() throws Exception {
     UpdateNote note = new UpdateNote();
@@ -311,81 +420,84 @@ public class NotesApiTest extends BaseControllerTest {
     note.setLastEdit(new Date());
     note.setTitle("DIY. Distillery banjo");
     note.setUserHash("NONEXISTANTE");
-    
+    note.setInitVector("87268473");
+
     CompleteNote complete = new CompleteNote();
     complete.setId("2");
     doThrow(NoteNotFoundException.class).when(service).update(any());
-    
-    mockMvc.perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)).with(csrf()))
+
+    mockMvc
+        .perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)).header("userId", "1234"))
         .andExpect(status().isNotFound());
   }
-  /*
-  @JsonProperty("id")
-  private String id = null;
-
-  @JsonProperty("title")
-  private String title = null;
-
-  @JsonProperty("content")
-  private String content = null;
-
-  @JsonProperty("userHash")
-  private String userHash = null;
-
-  @JsonProperty("lastEdit")
-  private Date lastEdit = null;
-   * */
+    
+  @Test
+  public void testPinNote_withCorrectRequest_shouldPinIt() throws Exception {
+    PinNote pinNote = new PinNote();
+    pinNote.setPinIt(true);
+    pinNote.setNoteId("2");
+    
+    mockMvc
+    .perform(put("/api/v1/notes/pin").contentType(jsonContentType).content(json(pinNote))
+        .header("userId", "1234"))
+      .andExpect(status().isOk());
+    
+    verify(service).pinNote(any(), matches("1234"));
+  }
   
-  /*
-   @ApiOperation(value = "Create Note", nickname = "createNote", notes = "Creates new Note entry.",
-      tags = {"Notes",})
- 
-  @RequestMapping(value = "/api/v1/notes", produces = {"application/json"},
-      consumes = {"application/json"}, method = RequestMethod.POST)
-  ResponseEntity<CompleteNote> createNote(
-      @ApiParam(value = "", required = true) @Valid @RequestBody CreateNote noteCreate);
-
-
-
-  @ApiOperation(value = "Get All Notes from user", nickname = "getNotes",
-      notes = "Returns all Notes in a shorter form from a user, paginated.",
-      response = OverviewNote.class, responseContainer = "List", tags = {"Notes",})
+  @Test
+  public void testPinNote_withNotExistingNote_shouldReturnNotFound() throws Exception {
+    PinNote pinNote = new PinNote();
+    pinNote.setPinIt(true);
+    pinNote.setNoteId("7657652");
+    
+    doThrow(NoteNotFoundException.class).when(service).pinNote(any(), anyString());
+    
+    mockMvc
+    .perform(put("/api/v1/notes/pin").contentType(jsonContentType).content(json(pinNote))
+        .header("userId", "1234"))
+      .andExpect(status().isNotFound());
+  }
   
-  @RequestMapping(value = "/api/v1/notes", produces = {"application/json"},
-      consumes = {"application/json"}, method = RequestMethod.GET)
-  ResponseEntity<List<OverviewNote>> getNotes(
-      @ApiParam(value = "Unique Identifier of the User requesting his notes.",
-          required = true) @RequestHeader(value = "userId", required = true) String userId,
-      @ApiParam(value = "Page of notes that's beeing returned.",
-          defaultValue = "0") @Valid @RequestParam(value = "page", required = false,
-              defaultValue = "0") Integer page,
-      @ApiParam(value = "Amount of notes per page.", defaultValue = "10") @Valid @RequestParam(
-          value = "items", required = false, defaultValue = "10") Integer items)
-      throws DtoValidationFailedException;
-
-
-  @ApiOperation(value = "Delete Note", nickname = "removeNote",
-      notes = "Deletes a Note with defined Id.", tags = {"Notes",})
+  @Test
+  public void testPinNote_withAccessingOtherUsersNote_shouldReturnForbidden() throws Exception {
+    PinNote pinNote = new PinNote();
+    pinNote.setPinIt(true);
+    pinNote.setNoteId("2");
+    
+    doThrow(AccessingOtherUsersNotesException.class).when(service).pinNote(any(), anyString());
+    
+    mockMvc
+    .perform(put("/api/v1/notes/pin").contentType(jsonContentType).content(json(pinNote))
+        .header("userId", "hacker"))
+      .andExpect(status().isForbidden());
+  }
   
-  @RequestMapping(value = "/api/v1/notes/{noteId}", produces = {"application/json"},
-      consumes = {"application/json"}, method = RequestMethod.DELETE)
-  ResponseEntity<Void> removeNote(
-      @ApiParam(value = "Unique identifier of a Note.",
-          required = true) @PathVariable("noteId") String noteId,
-      @ApiParam(value = "Unique Identifier of the User requesting his notes.",
-          required = true) @RequestHeader(value = "userId", required = true) String userId)
-      throws NoteNotFoundException, AccessingOtherUsersNotesException;
-
-
-  @ApiOperation(value = "Update Note", nickname = "updateNote", notes = "Updated a Note entry.",
-      tags = {"Notes",})
+  @Test
+  public void testPinNote_withMissingPinBoolean_shouldRetunBadRequest() throws Exception {
+    PinNote pinNote = new PinNote();
+    pinNote.setPinIt(null);
+    pinNote.setNoteId("2");
+    
+    doThrow(AccessingOtherUsersNotesException.class).when(service).pinNote(any(), anyString());
+    
+    mockMvc
+    .perform(put("/api/v1/notes/pin").contentType(jsonContentType).content(json(pinNote))
+        .header("userId", "1234"))
+      .andExpect(status().isBadRequest());
+  }
   
-  @RequestMapping(value = "/api/v1/notes", produces = {"application/json"},
-      consumes = {"application/json"}, method = RequestMethod.PUT)
-  ResponseEntity<Void> updateNote(
-      @ApiParam(value = "", required = true) @Valid @RequestBody UpdateNote noteUpdate)
-      throws NoteNotFoundException, AccessingOtherUsersNotesException;
-
-   * */
-  
+  @Test
+  public void testPinNote_withMissingNoteId_shouldRetunBadRequest() throws Exception {
+    PinNote pinNote = new PinNote();
+    pinNote.setPinIt(true);
+    pinNote.setNoteId(null);
+    
+    doThrow(AccessingOtherUsersNotesException.class).when(service).pinNote(any(), anyString());
+    
+    mockMvc
+    .perform(put("/api/v1/notes/pin").contentType(jsonContentType).content(json(pinNote))
+        .header("userId", "1234"))
+      .andExpect(status().isBadRequest());
+  }
 }

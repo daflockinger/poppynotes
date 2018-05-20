@@ -37,6 +37,32 @@ public class CreateNote   {
     return this;
   }
 
+  @NotEmpty
+  @JsonProperty("initVector")
+  private String initVector = null;
+  
+  
+
+  /**
+   * Unique Initialization Vector of the Note.
+   * @return initVector
+  **/
+  @ApiModelProperty(value = "Unique Initialization Vector of the Note for encryption.")
+
+
+  public String getInitVector() {
+    return initVector;
+  }
+
+  public void setInitVector(String initVector) {
+    this.initVector = initVector;
+  }
+
+  public CreateNote initVector(String initVector) {
+    this.initVector = initVector;
+    return this;
+  }
+  
   /**
    * Title of the Note.
    * @return title
@@ -124,6 +150,7 @@ public class CreateNote   {
     }
     CreateNote createNote = (CreateNote) o;
     return Objects.equals(this.title, createNote.title) &&
+        Objects.equals(this.initVector, createNote.initVector) &&
         Objects.equals(this.content, createNote.content) &&
         Objects.equals(this.userHash, createNote.userHash) &&
         Objects.equals(this.lastEdit, createNote.lastEdit);
@@ -131,7 +158,7 @@ public class CreateNote   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(title, content, userHash, lastEdit);
+    return Objects.hash(title, content, userHash, lastEdit, initVector);
   }
 
   @Override
@@ -140,6 +167,7 @@ public class CreateNote   {
     sb.append("class CreateNote {\n");
     
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
+    sb.append("    initVector: ").append(toIndentedString(initVector)).append("\n");
     sb.append("    content: ").append(toIndentedString(content)).append("\n");
     sb.append("    userHash: ").append(toIndentedString(userHash)).append("\n");
     sb.append("    lastEdit: ").append(toIndentedString(lastEdit)).append("\n");

@@ -28,12 +28,37 @@ public class CompleteNote   {
 
   @JsonProperty("lastEdit")
   private Date lastEdit = null;
+  
+  @JsonProperty("initVector")
+  private String initVector = null;
+  
+  
+
+  /**
+   * Unique Initialization Vector of the Note.
+   * @return initVector
+  **/
+  @ApiModelProperty(value = "Unique Initialization Vector of the Note for encryption.")
+
+
+  public String getInitVector() {
+    return initVector;
+  }
+
+  public void setInitVector(String initVector) {
+    this.initVector = initVector;
+  }
+
+  public CompleteNote initVector(String initVector) {
+    this.initVector = initVector;
+    return this;
+  }
 
   public CompleteNote id(String id) {
     this.id = id;
     return this;
   }
-
+  
   /**
    * Unique Identifier of the Note.
    * @return id
@@ -141,6 +166,7 @@ public class CompleteNote   {
     }
     CompleteNote completeNote = (CompleteNote) o;
     return Objects.equals(this.id, completeNote.id) &&
+        Objects.equals(this.initVector, completeNote.initVector) &&
         Objects.equals(this.title, completeNote.title) &&
         Objects.equals(this.content, completeNote.content) &&
         Objects.equals(this.userHash, completeNote.userHash) &&
@@ -149,7 +175,7 @@ public class CompleteNote   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, content, userHash, lastEdit);
+    return Objects.hash(id, title, content, userHash, lastEdit, initVector);
   }
 
   @Override
@@ -158,6 +184,7 @@ public class CompleteNote   {
     sb.append("class CompleteNote {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    initVector: ").append(toIndentedString(initVector)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    content: ").append(toIndentedString(content)).append("\n");
     sb.append("    userHash: ").append(toIndentedString(userHash)).append("\n");
