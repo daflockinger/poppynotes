@@ -1,18 +1,13 @@
 package com.flockinger.poppynotes.notesService;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
-@EnableDiscoveryClient
-@RestController
+@Controller
 public class NotesServiceApplication {
 
 	public static void main(String[] args) {
@@ -20,7 +15,8 @@ public class NotesServiceApplication {
 	}
 	
 	@RequestMapping(value = "/")
-	public void index(HttpServletResponse response) throws IOException {
-		response.sendRedirect("/swagger-ui.html");
-	}
+    public String index() {
+        System.out.println("swagger-ui.html");
+        return "redirect:swagger-ui.html";
+    }
 }

@@ -14,8 +14,10 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.flockinger.poppynotes.notesService.exception.AccessingOtherUsersNotesException;
+import com.flockinger.poppynotes.notesService.exception.CantUseInitVectorTwiceException;
 import com.flockinger.poppynotes.notesService.exception.DtoValidationFailedException;
 import com.flockinger.poppynotes.notesService.exception.NoteNotFoundException;
+import com.flockinger.poppynotes.notesService.exception.NoteSizeExceededException;
 import com.flockinger.poppynotes.notesService.dto.Error;
 
 @ControllerAdvice
@@ -29,7 +31,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
           new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
     
-    @ExceptionHandler(value = {DtoValidationFailedException.class})
+    @ExceptionHandler(value = {DtoValidationFailedException.class, NoteSizeExceededException.class})
     protected ResponseEntity<Object> handleBadRequest(DtoValidationFailedException ex, WebRequest request) {
         
     	return handleExceptionInternal(ex, createErrorValidatedModel(ex), 
@@ -37,7 +39,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
     
     
-    @ExceptionHandler(value = {AccessingOtherUsersNotesException.class})
+    @ExceptionHandler(value = {AccessingOtherUsersNotesException.class, 
+        CantUseInitVectorTwiceException.class})
     protected ResponseEntity<Object> handleConflict(Exception ex, WebRequest request) {
         
     	return handleExceptionInternal(ex, createErrorModel(ex), 

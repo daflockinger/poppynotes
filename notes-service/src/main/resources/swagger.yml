@@ -31,6 +31,12 @@ parameters:
     schema:
       $ref: '#/definitions/UpdateNote'
     required: true
+  PinNote:
+    name: pin-note
+    in: body
+    schema: 
+      $ref: '#/definitions/PinNote'
+    required: true
   IdUser:
     name: userId
     in: header
@@ -51,23 +57,16 @@ parameters:
     default: 10
     required: false
     type: integer
-  Archived:
-    name: show_archived
-    in: query
-    type: boolean
-    description: If true, only archived notes are returned. 
-    default: false
-    required: false
 paths:
   /api/v1/notes:
     get:
       summary: Get All Notes from user
       description: Returns all Notes in a shorter form from a user, paginated.
+      operationId: getNotes
       parameters:
         - $ref: '#/parameters/Page'
         - $ref: '#/parameters/Items'
         - $ref: '#/parameters/IdUser'
-        - $ref: '#/parameters/Archived'
       tags: 
         - Notes
       responses:
@@ -98,13 +97,17 @@ paths:
     post:
       summary: Create Note
       description: Creates new Note entry.
+      operationId: createNote
       parameters:
         - $ref: '#/parameters/NoteCreate'
+        - $ref: '#/parameters/IdUser'
       tags: 
         - Notes
       responses:
         201:
           description: Created Note.
+          schema:
+            $ref: '#/definitions/CompleteNote'
         400:
           description: Bad request (validation failed).
           schema:
@@ -126,8 +129,10 @@ paths:
     put:
       summary: Update Note
       description: Updated a Note entry.
+      operationId: updateNote
       parameters:
         - $ref: '#/parameters/NoteUpdate'
+        - $ref: '#/parameters/IdUser'
       tags: 
         - Notes
       responses:
@@ -151,10 +156,42 @@ paths:
             $ref: '#/definitions/Error'
         500:
           description: Internal Server Error.
+  /api/v1/notes/pin: 
+    put:
+      summary: Pin Note
+      description: Pin a Note.
+      operationId: pinNote
+      parameters:
+        - $ref: '#/parameters/PinNote'
+        - $ref: '#/parameters/IdUser'
+      tags: 
+        - Notes
+      responses:
+        200:
+          description: Note pinned/unpinned.
+        400:
+          description: Bad request (validation failed).
+          schema:
+            $ref: '#/definitions/Error'
+        401:
+          description: Unauthorized (need to log in / get token).
+        403:
+          description: Forbidden (no rights to access resource).
+        404:
+          description: Entity not found.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request results in a conflict.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error.
   /api/v1/notes/{noteId}:
     get:
       summary: Get Note
       description: Fetches Note with defined Id.
+      operationId: findNote
       parameters:
         - $ref: '#/parameters/IdNote'
         - $ref: '#/parameters/IdUser'
@@ -186,8 +223,10 @@ paths:
     delete:
       summary: Delete Note
       description: Deletes a Note with defined Id.
+      operationId: removeNote
       parameters:
         - $ref: '#/parameters/IdNote'
+        - $ref: '#/parameters/IdUser'
       tags: 
         - Notes
       responses:
@@ -212,6 +251,15 @@ paths:
         500:
           description: Internal Server Error.
 definitions:
+  PinNote:
+    type: object
+    properties:
+      pinIt:
+        type: boolean
+        description: Boolean if the note should be set pinned or not
+      noteId:
+        type: string
+        description: Unique Identifier of the Note.
   CreateNote:
     type: object
     properties:
@@ -221,20 +269,13 @@ definitions:
       content:
         type: string
         description: Text content of the Note (the actual note).
-      userId:
-        type: integer
-        format: int64
+      userHash:
+        type: string
         description: Unique Identifier of the user that created that note.
       lastEdit:
         type: string
         format: date
         description: Date the user last edited the note.
-      pinned:
-        type: boolean
-        description: Pin for important messages to be shown always on top. 
-      initVector:
-        type: string
-        description: Initialization Vector (iv) used for message en/decryption
   UpdateNote:
     type: object
     properties:
@@ -247,9 +288,8 @@ definitions:
       content:
         type: string
         description: Text content of the Note (the actual note).
-      userId:
-        type: integer
-        format: int64
+      userHash:
+        type: string
         description: Unique Identifier of the user that created that note.
       lastEdit:
         type: string
@@ -258,12 +298,6 @@ definitions:
       pinned:
         type: boolean
         description: Pin for important messages to be shown always on top. 
-      archived:
-        type: boolean
-        description: Determines if notes is archived and not shown in regular listing (default false).
-      initVector:
-        type: string
-        description: Initialization Vector (iv) used for message en/decryption
   CompleteNote:
     type: object
     properties:
@@ -276,20 +310,13 @@ definitions:
       content:
         type: string
         description: Text content of the Note (the actual note).
-      userId:
-        type: integer
-        format: int64
+      userHash:
+        type: string
         description: Unique Identifier of the user that created that note.
       lastEdit:
         type: string
         format: date
         description: Date the user last edited the note.
-      archived:
-        type: boolean
-        description: Determines if notes is archived and not shown in regular listing (default false).
-      initVector:
-        type: string
-        description: Initialization Vector (iv) used for message en/decryption
   OverviewNote:
     type: object
     properties:
@@ -299,9 +326,9 @@ definitions:
       title:
         type: string
         description: Title of the Note.
-      partContent:
+      content:
         type: string
-        description: Only the first lines of the text content.
+        description: Text content of the Note (the actual note).
       lastEdit:
         type: string
         format: date
@@ -309,18 +336,9 @@ definitions:
       pinned:
         type: boolean
         description: Pin for important messages to be shown always on top.
-      archived:
-        type: boolean
-        description: Determines if notes is archived and not shown in regular listing (default false).
-      initVector:
-        type: string
-        description: Initialization Vector (iv) used for message en/decryption
   Error:
     type: object
     properties:
-      code:
-        type: integer
-        format: int32
       message:
         type: string
       fields:

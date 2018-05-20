@@ -1,0 +1,35 @@
+<app-navbar (noteCreate)="onCardDeckUpdate($event)"></app-navbar>
+
+<div class="mx-auto px-2 card-deck-container">
+    <div class="row">
+      <div class="col">
+          <div class="card-columns">
+                <app-card *ngFor="let note of notes" [note]="note"
+                 (triggerEdit)="openNoteEditModal(template, $event)"
+                 (resortAnchored)="resortAnchored($event)"></app-card>
+          </div>
+      </div>
+    </div>
+    <div class="row text-center">
+        <div class="col">
+          <button type="button" class="btn btn-secondary" (click)="fetchNext()">
+            Load more...
+          </button>
+        </div>
+    </div>
+  </div>
+
+
+  <ng-template #template>
+    <div class="modal-header">
+      <h5 class="modal-title pull-left">Edit Note</h5>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+        <fa name="times"></fa>
+      </button>
+    </div>
+    <div class="modal-body">
+      <app-card-edit [noteId]="currentNoteId"
+      (update)="onCardDeckUpdate($event)"
+      (removed)="onCardDeckRemoval($event)"></app-card-edit>
+    </div>
+  </ng-template>

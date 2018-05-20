@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.validation.FieldError;
 
-public class DtoValidationFailedException extends Exception{
+public class DtoValidationFailedException extends RuntimeException {
 
 	/**
 	 * 

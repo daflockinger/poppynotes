@@ -1,0 +1,26 @@
+<form *ngIf="noteForm" [formGroup]="noteForm">
+  <div class="form-group">
+    <input class="form-control" id="title" formControlName="title" placeholder="Note Title" />
+  </div>
+  <div class="form-group">
+    <textarea appResizeABit class="form-control note-field" id="content" rows="5"
+    formControlName="content" placeholder="Note Text"></textarea>
+  </div>
+
+
+  <div class="btn-toolbar" role="toolbar" *ngIf="note">
+      <div class="btn-group mr-2" role="group">
+          <button type="button" class="btn btn-secondary" (click)="encryptAndSaveNote()">
+            <fa name="lock" size="lg"></fa> Encrypt &amp; Save
+          </button>
+      </div>
+      <div class="btn-group mr-2" role="group" *ngIf="note.id">
+          <button type="button" class="btn btn-secondary" (click)="deleteNote()">
+            <fa name="fire" size="lg"></fa> Delete
+          </button>
+      </div>
+      <div class="btn-group" role="group">
+
+      </div>
+    </div>
+</form>

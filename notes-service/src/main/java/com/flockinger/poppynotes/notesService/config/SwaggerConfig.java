@@ -27,14 +27,15 @@ public class SwaggerConfig {
             .contact(new Contact("","", ""))
             .build();
     }
-
+    
     @Bean
     public Docket customImplementation(){
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
                     .apis(RequestHandlerSelectors.basePackage("com.flockinger.poppynotes.notesService.api"))
                     .build()
+                .directModelSubstitute(org.threeten.bp.LocalDate.class, java.sql.Date.class)
+                .directModelSubstitute(org.threeten.bp.OffsetDateTime.class, java.util.Date.class)
                 .apiInfo(apiInfo());
     }
-
 }

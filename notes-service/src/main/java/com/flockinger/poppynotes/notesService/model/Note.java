@@ -1,101 +1,97 @@
 package com.flockinger.poppynotes.notesService.model;
 
 import java.util.Date;
-
 import javax.validation.constraints.NotNull;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection="note")
-@CompoundIndexes(value={
-		@CompoundIndex(name="lastedit_user_idx",def="{'lastEdit': -1, 'userId' : 1}"),
-		@CompoundIndex(name="user_pinned_idx",def="{'userId' : 1, 'pinned' : -1}"),
-		@CompoundIndex(name="lastedit_user_pin_idx",def="{'lastEdit': -1, 'userId' : 1, 'pinned' : -1}")
-})
+@Document(collection = "note")
+@CompoundIndexes(
+    value = {@CompoundIndex(name = "lastedit_user_idx", def = "{'lastEdit': -1, 'userId' : 1}"),
+        @CompoundIndex(name = "user_pinned_idx", def = "{'userId' : 1, 'pinned' : -1}"),
+        @CompoundIndex(name = "lastedit_user_pin_idx",
+            def = "{'lastEdit': -1, 'userId' : 1, 'pinned' : -1}")})
 public class Note {
 
-	@NotNull
-	@Id
-	private String id;
-	
-	@NotNull
-	@Indexed
-	private Long userId;
+  @NotNull
+  @Id
+  private String id;
 
-	@NotNull
-	private Boolean pinned;
-	
-	@NotNull
-	@Indexed
-	private Date lastEdit;
+  @NotNull
+  @Indexed
+  private String userHash;
 
-	@NotNull
-	private String title;
+  @NotNull
+  private Boolean pinned;
 
-	
-	private String content;
-	
-	@NotNull
-	private String initVector;
-	
-	
-	public String getInitVector() {
-		return initVector;
-	}
+  @NotNull
+  @Indexed
+  private Date lastEdit;
 
-	public void setInitVector(String initVector) {
-		this.initVector = initVector;
-	}
+  @NotNull
+  private String title;
+  
+  private String initVector;
 
-	public String getId() {
-		return id;
-	}
+  private String content;
 
-	public void setId(String id) {
-		this.id = id;
-	}
 
-	public Long getUserId() {
-		return userId;
-	}
+  public String getInitVector() {
+    return initVector;
+  }
 
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
+  public void setInitVector(String initVector) {
+    this.initVector = initVector;
+  }
 
-	public Boolean getPinned() {
-		return pinned;
-	}
+  public String getUserHash() {
+    return userHash;
+  }
 
-	public void setPinned(Boolean pinned) {
-		this.pinned = pinned;
-	}
+  public void setUserHash(String userHash) {
+    this.userHash = userHash;
+  }
 
-	public Date getLastEdit() {
-		return lastEdit;
-	}
+  public String getId() {
+    return id;
+  }
 
-	public void setLastEdit(Date lastEdit) {
-		this.lastEdit = lastEdit;
-	}
+  public void setId(String id) {
+    this.id = id;
+  }
 
-	public String getTitle() {
-		return title;
-	}
+  public Boolean getPinned() {
+    return pinned;
+  }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+  public void setPinned(Boolean pinned) {
+    this.pinned = pinned;
+  }
 
-	public String getContent() {
-		return content;
-	}
+  public Date getLastEdit() {
+    return lastEdit;
+  }
 
-	public void setContent(String content) {
-		this.content = content;
-	}
+  public void setLastEdit(Date lastEdit) {
+    this.lastEdit = lastEdit;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public String getContent() {
+    return content;
+  }
+
+  public void setContent(String content) {
+    this.content = content;
+  }
 }
