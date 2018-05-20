@@ -1,0 +1,20 @@
+<div class="card">
+    <div class="card-header" >
+      <div class="d-flex justify-content-between">
+        <span class="p-2">
+          <a *ngIf="note.pinned" class="text-secondary" href="#" (click)="anchorNote(false)" title="Un-Anchor"><fa name="anchor"></fa></a>
+          <a *ngIf="!note.pinned" class="text-muted" href="#" (click)="anchorNote(true)" title="Anchor on Top"><fa name="anchor" rotate="vertical"></fa></a>
+        </span>
+        <span class="p-2" (click)="triggerOpenNoteEdit(note.id)">
+          <a class="text-secondary" href="#" title="Edit Note"><fa name="edit"></fa></a>
+        </span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h5 class="card-title">{{note.title}}</h5>
+      <p class="card-text">{{note.content}}</p>
+    </div>
+    <div class="card-footer">
+      <small class="text-muted">Last updated {{note.lastEdit | amTimeAgo}}</small>
+    </div>
+  </div>

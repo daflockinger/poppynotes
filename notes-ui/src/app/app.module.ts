@@ -1,20 +1,55 @@
+import { BrowserXhr } from '@angular/http';
+import { CustomCorsExtension } from './service/custom-cors-extension';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { AngularFontAwesomeModule } from 'angular-font-awesome';
+import { CommonModule, HashLocationStrategy, LocationStrategy } from '@angular/common';
+import { HttpClientModule, HttpClientXsrfModule } from '@angular/common/http';
+import { MomentModule } from 'ngx-moment';
+import { ModalModule } from 'ngx-bootstrap';
+import {Ng2Webstorage} from 'ngx-webstorage';
+import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './navbar/navbar.component';
+import { CardDeckComponent } from './card-deck/card-deck.component';
+import { CardComponent } from './card-deck/card/card.component';
+import { UserSecretComponent } from './user-secret/user-secret.component';
+import { CardEditComponent } from './card-edit/card-edit.component';
+import { NoteResizerDirective } from './note-resizer.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
-    NavbarComponent
+    NavbarComponent,
+    CardDeckComponent,
+    CardComponent,
+    UserSecretComponent,
+    CardEditComponent,
+    NoteResizerDirective
   ],
   imports: [
     BrowserModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    AngularFontAwesomeModule,
+    CommonModule,
+    HttpClientModule,
+    HttpClientXsrfModule,
+    MomentModule,
+    ModalModule.forRoot(),
+    Ng2Webstorage,
+    FormsModule,
+    ReactiveFormsModule
   ],
-  providers: [],
+  providers: [
+    {provide: BrowserXhr, useClass: CustomCorsExtension},
+    {provide: LocationStrategy, useClass: HashLocationStrategy}
+  ],
+  entryComponents: [
+    UserSecretComponent
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

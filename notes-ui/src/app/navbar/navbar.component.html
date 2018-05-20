@@ -1,1 +1,38 @@
-<h1>Screw Angular Material2 -> go to Bootstrap oida!</h1>
+<nav class="fixed-top bg-dark">
+  <div class="d-flex justify-content-between">
+    <div class="p-2"><a class="left" href="#"><h4 class="text-white">Poppy Notes</h4></a></div>
+
+    <div class="p-2">
+        <ul class="flex-container nowrap">
+          <li  class="flex-item">
+              <a class="text-secondary" title="Create Note" href="#" (click)="openNoteEditModal(template)">
+                  <fa name="edit" size="2x"></fa>
+                </a>
+          </li>
+        </ul>
+      </div>
+
+    <div class="p-2">
+      <ul class="flex-container nowrap float-right">
+        <li class="flex-item">
+            <a class="text-secondary" title="User Secrets" href="#" (click)="openUserSecretModal()">
+                <fa name="user-secret" size="2x"></fa>
+            </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<ng-template #template>
+  <div class="modal-header">
+    <h5 class="modal-title pull-left">Create Note</h5>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+      <fa name="times"></fa>
+    </button>
+  </div>
+  <div class="modal-body">
+    <app-card-edit (update)="onCreateNote($event)"></app-card-edit>
+  </div>
+</ng-template>
+

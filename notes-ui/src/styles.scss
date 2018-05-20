@@ -1,3 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'variables';
+
+$primary: #9C27B0;
+$secondary: #FFC107;
+$secondary-ultra-light: #FFFDE7;
+$light: #E1BEE7;
+$ultra-light: #F3E5F5;
+$dark: #7B1FA2;
+$yiq-text-dark: #212121;
+
+$body-bg: $ultra-light;
+$body-color: #212121;
+
 @import '../node_modules/bootstrap/scss/bootstrap';
+

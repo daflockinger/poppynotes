@@ -1,0 +1,64 @@
+{
+  "_from": "@types/node-forge",
+  "_id": "@types/node-forge@0.7.3",
+  "_inBundle": false,
+  "_integrity": "sha512-P75jvXgBwj1B8JJwvrhdwVS4Fx9r+MSq492LAnvYhEGcgeRY4IzTSSA4ovSQXn/tKE8ByeiuKR5/TTah1PMF7g==",
+  "_location": "/@types/node-forge",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "@types/node-forge",
+    "name": "@types/node-forge",
+    "escapedName": "@types%2fnode-forge",
+    "scope": "@types",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/@types/node-forge/-/node-forge-0.7.3.tgz",
+  "_shasum": "22fd1e89db2f24bded1f72bf2968404ec36c16f1",
+  "_spec": "@types/node-forge",
+  "_where": "/root/tenWorkspace/poppynotes/notes-ui",
+  "bugs": {
+    "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git/issues"
+  },
+  "bundleDependencies": false,
+  "contributors": [
+    {
+      "name": "Seth Westphal",
+      "url": "https://github.com/westy92"
+    },
+    {
+      "name": "Kay Schecker",
+      "url": "https://github.com/flynetworks"
+    },
+    {
+      "name": "Aakash Goenka",
+      "url": "https://github.com/a-k-g"
+    },
+    {
+      "name": "Rafal2228",
+      "url": "https://github.com/rafal2228"
+    }
+  ],
+  "dependencies": {},
+  "deprecated": false,
+  "description": "TypeScript definitions for node-forge",
+  "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped.git#readme",
+  "license": "MIT",
+  "main": "",
+  "name": "@types/node-forge",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DefinitelyTyped/DefinitelyTyped.git.git"
+  },
+  "scripts": {},
+  "typeScriptVersion": "2.0",
+  "typesPublisherContentHash": "36a1c55d86fad4b0fd2d0126a7c246729fa1ed6bf5d7e231567673f015696ff4",
+  "version": "0.7.3"
+}
