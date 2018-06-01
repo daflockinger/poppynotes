@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { AngularFontAwesomeComponent } from 'angular-font-awesome';
 
 import { CardEditComponent } from './card-edit.component';
 
@@ -8,7 +9,8 @@ describe('CardEditComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CardEditComponent ]
+      declarations: [ CardEditComponent,
+        AngularFontAwesomeComponent ]
     })
     .compileComponents();
   }));

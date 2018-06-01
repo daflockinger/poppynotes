@@ -1,3 +1,4 @@
+import { NotesService } from './../service/api/notes.service';
 import { SecretstoreService } from './../service/crypto/secretstore.service';
 import { CryptoService } from './../service/crypto/crypto.service';
 import { Component, OnInit, Inject } from '@angular/core';
@@ -9,25 +10,29 @@ import { FormBuilder, FormControl, FormGroup, Validators, AbstractControl } from
   selector: 'app-user-secret',
   templateUrl: './user-secret.component.html',
   styleUrls: ['./user-secret.component.scss'],
-  providers: [CryptoService, SecretstoreService]
+  providers: [CryptoService, SecretstoreService, NotesService]
 })
 export class UserSecretComponent implements OnInit {
 
   constructor(public bsModalRef: BsModalRef, private crypto: CryptoService,
     private secretStore: SecretstoreService,
+    private noteService: NotesService,
     @Inject(FormBuilder) private formBuilder: FormBuilder) { }
 
   secretForm: FormGroup;
 
   keyEditModeDisabled = true;
   userKey = '';
+  userHash = '';
 
   ngOnInit() {
     this.userKey = this.secretStore.getKey();
+    this.userHash = this.secretStore.getUserHash();
 
     this.secretForm = this.formBuilder.group({
       user: this.formBuilder.group({
         userKey: ['', Validators.required],
+        userHash: ['']
       })
     });
     this.disableEditKeyMode();
@@ -38,7 +43,19 @@ export class UserSecretComponent implements OnInit {
 
   updateUserForm() {
     this.secretForm.controls.user.patchValue({
-      userKey: this.userKey
+      userKey: this.userKey,
+      userHash: this.userHash
+    });
+    this.checkIfUserAllowed();
+  }
+
+  private checkIfUserAllowed() {
+    let userHash = this.secretStore.getUserHash();
+    if (userHash === undefined) {
+      userHash = '';
+    }
+    this.noteService.getNotes(userHash, 0, 1).subscribe(notes => {
+      this.bsModalRef.hide();
     });
   }
 
@@ -54,8 +71,8 @@ export class UserSecretComponent implements OnInit {
   createUser() {
     this.userKey = this.crypto.generateKeyHex();
     this.secretStore.storeKey(this.userKey);
-    const userHash = this.crypto.createHash(this.userKey);
-    this.secretStore.storeUserHash(userHash);
+    this.userHash = this.crypto.createHash(this.userKey);
+    this.secretStore.storeUserHash(this.userHash);
     this.updateUserForm();
   }
 
@@ -63,8 +80,8 @@ export class UserSecretComponent implements OnInit {
     this.userKey = this.secretForm.value.user.userKey;
 
     this.secretStore.storeKey(this.userKey);
-    const userHash = this.crypto.createHash(this.userKey);
-    this.secretStore.storeUserHash(userHash);
+    this.userHash = this.crypto.createHash(this.userKey);
+    this.secretStore.storeUserHash(this.userHash);
     this.updateUserForm();
     this.disableEditKeyMode();
   }

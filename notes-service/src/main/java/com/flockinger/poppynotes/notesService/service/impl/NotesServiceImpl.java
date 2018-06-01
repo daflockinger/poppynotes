@@ -77,7 +77,9 @@ public class NotesServiceImpl implements NoteService {
     assertInitVectorNotAlreadyUsed(note.getInitVector(), note.getUserHash());
     Note createdNote = map(note);
     validateNote(createdNote);
-    
+    if(createdNote.getPinned() == null) {
+      createdNote.setPinned(false);
+    }
     return map(dao.save(createdNote));
   }
 
@@ -89,7 +91,9 @@ public class NotesServiceImpl implements NoteService {
     assertCorrectNoteUser(findNoteById(note.getId()).getUserHash(), note.getUserHash());
     Note updateNote = map(note);
     validateNote(updateNote);
-    
+    if(updateNote.getPinned() == null) {
+      updateNote.setPinned(false);
+    }
     dao.save(updateNote);
   }
 

@@ -28,6 +28,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import com.flockinger.poppynotes.notesService.config.SecurityConfig;
 import com.flockinger.poppynotes.notesService.config.WebConfig;
+import com.flockinger.poppynotes.notesService.dao.UserWhitelistRepository;
 import com.flockinger.poppynotes.notesService.dto.CompleteNote;
 import com.flockinger.poppynotes.notesService.dto.CreateNote;
 import com.flockinger.poppynotes.notesService.dto.PinNote;
@@ -39,7 +40,9 @@ import com.flockinger.poppynotes.notesService.service.NoteService;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest
-@Import({WebConfig.class, SecurityConfig.class, RateLimitInterceptor.class})
+@Import({WebConfig.class, SecurityConfig.class, 
+  RateLimitInterceptor.class, WhitelistUserInterceptor.class, 
+  UserWhitelistRepository.class})
 public class NotesApiTest extends BaseControllerTest {
 
   @Autowired
@@ -50,10 +53,14 @@ public class NotesApiTest extends BaseControllerTest {
   
   @MockBean
   private RateLimitInterceptor mockCopter;
+  @MockBean
+  private UserWhitelistRepository whitelistMockRepository;
 
   @Before
   public void setup() throws Exception {
     when(mockCopter.preHandle(any(), any(), any())).thenReturn(true);
+    when(whitelistMockRepository
+        .existsByAllowedUserHash(anyString())).thenReturn(true);
   }
   
   @Test
@@ -157,7 +164,7 @@ public class NotesApiTest extends BaseControllerTest {
   }
 
   @Test
-  public void testCreateNote_withNoteMissingUserHash_shouldReturnBadRequest() throws Exception {
+  public void testCreateNote_withNoteMissingUserHash_shouldReturnUnauthorized() throws Exception {
     CreateNote note = new CreateNote();
     note.setContent("Flexitarian offal locavore unicorn hammock banh mi single-origin coffee ");
     note.setLastEdit(new Date());
@@ -171,7 +178,7 @@ public class NotesApiTest extends BaseControllerTest {
     mockMvc
         .perform(
             post("/api/v1/notes").contentType(jsonContentType).content(json(note)))
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
@@ -188,7 +195,8 @@ public class NotesApiTest extends BaseControllerTest {
 
     mockMvc
         .perform(
-            post("/api/v1/notes").contentType(jsonContentType).content(json(note)))
+            post("/api/v1/notes").contentType(jsonContentType)
+            .content(json(note)).header("userId", "1234"))
         .andExpect(status().isBadRequest());
   }
 
@@ -206,7 +214,8 @@ public class NotesApiTest extends BaseControllerTest {
 
     mockMvc
         .perform(
-            post("/api/v1/notes").contentType(jsonContentType).content(json(note)))
+            post("/api/v1/notes").contentType(jsonContentType)
+            .content(json(note)).header("userId", "1234"))
         .andExpect(status().isBadRequest());
   }
 
@@ -224,7 +233,8 @@ public class NotesApiTest extends BaseControllerTest {
 
     mockMvc
         .perform(
-            post("/api/v1/notes").contentType(jsonContentType).content(json(note)))
+            post("/api/v1/notes").contentType(jsonContentType)
+            .content(json(note)).header("userId", "1234"))
         .andExpect(status().isBadRequest());
   }
 
@@ -242,7 +252,8 @@ public class NotesApiTest extends BaseControllerTest {
 
     mockMvc
         .perform(
-            post("/api/v1/notes").contentType(jsonContentType).content(json(note)))
+            post("/api/v1/notes").contentType(jsonContentType)
+            .content(json(note)).header("userId", "1234"))
         .andExpect(status().isBadRequest());
   }
 
@@ -281,7 +292,7 @@ public class NotesApiTest extends BaseControllerTest {
 
     mockMvc
         .perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)))
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
@@ -298,7 +309,8 @@ public class NotesApiTest extends BaseControllerTest {
     doNothing().when(service).update(any());
 
     mockMvc
-        .perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)))
+        .perform(put("/api/v1/notes").contentType(jsonContentType)
+            .content(json(note)).header("userId", "1234"))
         .andExpect(status().isBadRequest());
   }
 
@@ -316,7 +328,8 @@ public class NotesApiTest extends BaseControllerTest {
     doNothing().when(service).update(any());
 
     mockMvc
-        .perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)))
+        .perform(put("/api/v1/notes").contentType(jsonContentType)
+            .content(json(note)).header("userId", "1234"))
         .andExpect(status().isBadRequest());
   }
 
@@ -334,7 +347,8 @@ public class NotesApiTest extends BaseControllerTest {
     doNothing().when(service).update(any());
 
     mockMvc
-        .perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)))
+        .perform(put("/api/v1/notes").contentType(jsonContentType)
+            .content(json(note)).header("userId", "1234"))
         .andExpect(status().isBadRequest());
   }
 
@@ -352,7 +366,8 @@ public class NotesApiTest extends BaseControllerTest {
     doNothing().when(service).update(any());
 
     mockMvc
-        .perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)))
+        .perform(put("/api/v1/notes").contentType(jsonContentType)
+            .content(json(note)).header("userId", "1234"))
         .andExpect(status().isBadRequest());
   }
 
@@ -370,7 +385,8 @@ public class NotesApiTest extends BaseControllerTest {
     doNothing().when(service).update(any());
 
     mockMvc
-        .perform(put("/api/v1/notes").contentType(jsonContentType).content(json(note)))
+        .perform(put("/api/v1/notes").contentType(jsonContentType)
+            .content(json(note)).header("userId", "1234"))
         .andExpect(status().isBadRequest());
   }
 

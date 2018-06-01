@@ -24,6 +24,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>10</java.version>
 		<spring-cloud.version>Finchley.RC1</spring-cloud.version>
+		<docker.image.prefix>flockinger</docker.image.prefix>
 	</properties>
 
 	<dependencies>

@@ -1,14 +1,18 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { AngularFontAwesomeComponent } from 'angular-font-awesome';
+
 
 import { UserSecretComponent } from './user-secret.component';
 
-describe.skip('UserSecretComponent', () => {
+describe('UserSecretComponent', () => {
   let component: UserSecretComponent;
   let fixture: ComponentFixture<UserSecretComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ UserSecretComponent ]
+      declarations: [ UserSecretComponent,
+        AngularFontAwesomeComponent
+      ]
     })
     .compileComponents();
   }));
