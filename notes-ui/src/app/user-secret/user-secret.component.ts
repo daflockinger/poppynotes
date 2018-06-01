@@ -24,8 +24,17 @@ export class UserSecretComponent implements OnInit {
   keyEditModeDisabled = true;
   userKey = '';
   userHash = '';
+  userAllowed: boolean;
+  isInitFinished = false;
 
   ngOnInit() {
+    this.checkIfUserAllowed().subscribe(notes => {
+      this.userAllowed = true;
+      this.isInitFinished = true;
+    }, error => {
+      this.userAllowed = false;
+      this.isInitFinished = true;
+    });
     this.userKey = this.secretStore.getKey();
     this.userHash = this.secretStore.getUserHash();
 
@@ -46,18 +55,23 @@ export class UserSecretComponent implements OnInit {
       userKey: this.userKey,
       userHash: this.userHash
     });
-    this.checkIfUserAllowed();
+    this.checkIfUserAllowed().subscribe(notes => {
+      this.bsModalRef.hide();
+    });
   }
 
   private checkIfUserAllowed() {
     let userHash = this.secretStore.getUserHash();
-    if (userHash === undefined) {
+    if (userHash === null) {
       userHash = '';
     }
-    this.noteService.getNotes(userHash, 0, 1).subscribe(notes => {
-      this.bsModalRef.hide();
-    });
+    return this.noteService.getNotes(userHash, 0, 1);
   }
+
+  public isUserAllowed() {
+    return this.userAllowed;
+  }
+
 
   enableEditKeyMode() {
     this.keyEditModeDisabled = false;
