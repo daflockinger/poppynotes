@@ -30,6 +30,8 @@ import io.swagger.annotations.ApiResponses;
 
 @Api(value = "api", description = "the api API")
 public interface NotesApi {
+  
+  public final static String USER_HEADER = "userId";
 
   @ApiOperation(value = "Create Note", nickname = "createNote", notes = "Creates new Note entry.",
       response = CompleteNote.class, tags = {"Notes",})
@@ -48,7 +50,7 @@ public interface NotesApi {
   ResponseEntity<CompleteNote> createNote(
       @ApiParam(value = "", required = true) @Valid @RequestBody CreateNote noteCreate,
       @ApiParam(value = "Unique Identifier of the User requesting his notes.",
-          required = true) @RequestHeader(value = "userId", required = true) String userId)
+          required = true) @RequestHeader(value = USER_HEADER, required = true) String userId)
       throws CantUseInitVectorTwiceException;
 
 
@@ -69,7 +71,7 @@ public interface NotesApi {
       @ApiParam(value = "Unique identifier of a Note.",
           required = true) @PathVariable("noteId") String noteId,
       @ApiParam(value = "Unique Identifier of the User requesting his notes.",
-          required = true) @RequestHeader(value = "userId", required = true) String userId)
+          required = true) @RequestHeader(value = USER_HEADER, required = true) String userId)
       throws NoteNotFoundException, AccessingOtherUsersNotesException;
 
 
@@ -112,7 +114,7 @@ public interface NotesApi {
   ResponseEntity<Void> pinNote(
       @ApiParam(value = "", required = true) @Valid @RequestBody PinNote pinNote,
       @ApiParam(value = "Unique Identifier of the User requesting his notes.",
-          required = true) @RequestHeader(value = "userId", required = true) String userId)
+          required = true) @RequestHeader(value = USER_HEADER, required = true) String userId)
       throws NoteNotFoundException, AccessingOtherUsersNotesException;
 
 
@@ -132,7 +134,7 @@ public interface NotesApi {
       @ApiParam(value = "Unique identifier of a Note.",
           required = true) @PathVariable("noteId") String noteId,
       @ApiParam(value = "Unique Identifier of the User requesting his notes.",
-          required = true) @RequestHeader(value = "userId", required = true) String userId)
+          required = true) @RequestHeader(value = USER_HEADER, required = true) String userId)
       throws NoteNotFoundException, AccessingOtherUsersNotesException;
 
 
@@ -151,7 +153,7 @@ public interface NotesApi {
   ResponseEntity<Void> updateNote(
       @ApiParam(value = "", required = true) @Valid @RequestBody UpdateNote noteUpdate,
       @ApiParam(value = "Unique Identifier of the User requesting his notes.",
-          required = true) @RequestHeader(value = "userId", required = true) String userId)
+          required = true) @RequestHeader(value = USER_HEADER, required = true) String userId)
       throws NoteNotFoundException, AccessingOtherUsersNotesException,
       CantUseInitVectorTwiceException;
 

@@ -58,6 +58,7 @@ public class NoteServiceTest extends BaseDataBaseTest {
     assertEquals("check last edit date equals", note.getLastEdit(), readNote.getLastEdit());
     assertEquals("check title equals", note.getTitle(), readNote.getTitle());
     assertEquals("check user ID equals", note.getUserHash(), readNote.getUserHash());
+    assertFalse("verify pinned is false", readNote.isPinned());
   }
 
 
@@ -94,7 +95,7 @@ public class NoteServiceTest extends BaseDataBaseTest {
         newNote.getContent());
     assertEquals("check saved title", "Nescio brains an Undead zombies.", notes.get(0).getTitle());
     assertEquals("check saved last edit date", new Date(0), notes.get(0).getLastEdit());
-    assertNull("check saved pinned status", notes.get(0).isPinned());
+    assertFalse("check saved pinned status", notes.get(0).isPinned());
   }
   
   @Test(expected=NoteSizeExceededException.class)
@@ -179,6 +180,29 @@ public class NoteServiceTest extends BaseDataBaseTest {
     assertEquals("check updated content", updatedNote.getContent(), update.getContent());
     assertEquals("check updated last edit date", updatedNote.getLastEdit(), update.getLastEdit());
     assertEquals("check updated pinned status", updatedNote.getPinned(), update.isPinned());
+    assertEquals("check updated title", updatedNote.getTitle(), update.getTitle());
+    assertEquals("check unchanged userId", updatedNote.getUserHash(), update.getUserHash());
+  }
+  
+  @Test
+  public void testUpdate_withValidUpdatePinnedNull_shouldUpdateAndStorePinnedFalse() throws NoteNotFoundException,
+      AccessingOtherUsersNotesException, CantUseInitVectorTwiceException {
+    UpdateNote update = new UpdateNote();
+    update.setId(dao.findAll().stream().findFirst().get().getId());
+    update.setContent(
+        "De braaaiiiins apocalypsi gorger omero prefrontal cortex undead survivor fornix dictum mauris. ");
+    update.setTitle("Nigh basal ganglia tofth eliv ingdead.");
+    update.setLastEdit(new Date(0));
+    update.setPinned(null);
+    update.setUserHash("1");
+    update.setInitVector("99999999");
+
+    service.update(update);
+
+    Note updatedNote = dao.findById(update.getId()).get();
+    assertEquals("check updated content", updatedNote.getContent(), update.getContent());
+    assertEquals("check updated last edit date", updatedNote.getLastEdit(), update.getLastEdit());
+    assertFalse("check updated pinned status", updatedNote.getPinned());
     assertEquals("check updated title", updatedNote.getTitle(), update.getTitle());
     assertEquals("check unchanged userId", updatedNote.getUserHash(), update.getUserHash());
   }
@@ -287,13 +311,14 @@ public class NoteServiceTest extends BaseDataBaseTest {
 
   @Test
   public void testfindNotesByUserHashPaginated_withCorrectUserIdFirstPage4Items_shouldReturnCorrectAndSorted() {
-    List<OverviewNote> notes = service.findNotesByUserHashPaginated("1", PageRequest.of(0, 4));
+    List<OverviewNote> notes = service.findNotesByUserHashPaginated("1", PageRequest.of(0, 5));
 
-    assertEquals("should return 4 notes", 4, notes.size());
+    assertEquals("should return 4 notes", 5, notes.size());
     assertEquals("should contain first pinned entry", "1-pinned-latest", notes.get(0).getTitle());
     assertEquals("should contain second pinned entry", "2-pinned-second", notes.get(1).getTitle());
     assertEquals("should contain third pinned entry", "3-pinned-third", notes.get(2).getTitle());
     assertEquals("should contain first regular entry", "1latest", notes.get(3).getTitle());
+    assertEquals("should contain second regular entry", "2second", notes.get(4).getTitle());
     OverviewNote firstNote = notes.get(0);
     Note expectedFirst = dao.findById(firstNote.getId()).get();
 

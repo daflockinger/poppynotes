@@ -17,7 +17,7 @@ import {
   HttpResponse, HttpEvent
 } from '@angular/common/http';
 import { CustomHttpUrlEncodingCodec } from '../encoder';
-
+import { environment } from './../../../environments/environment.prod';
 import { Observable } from 'rxjs/Observable';
 
 import { CompleteNote } from '../model/completeNote';
@@ -37,6 +37,9 @@ export class NotesService {
   public configuration = new Configuration();
 
   constructor(protected httpClient: HttpClient, @Optional() configuration: Configuration) {
+    if (environment.apiUrl !== undefined) {
+      this.basePath = environment.apiUrl;
+    }
   }
 
   /**

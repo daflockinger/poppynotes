@@ -32,7 +32,8 @@ public class CompleteNote   {
   @JsonProperty("initVector")
   private String initVector = null;
   
-  
+  @JsonProperty("pinned")
+  private Boolean pinned = null;
 
   /**
    * Unique Initialization Vector of the Note.
@@ -155,6 +156,26 @@ public class CompleteNote   {
     this.lastEdit = lastEdit;
   }
 
+  
+  public CompleteNote pinned(Boolean pinned) {
+    this.pinned = pinned;
+    return this;
+  }
+
+  /**
+   * Pin for important messages to be shown always on top.
+   * @return pinned
+  **/
+  @ApiModelProperty(value = "Pin for important messages to be shown always on top.")
+
+
+  public Boolean isPinned() {
+    return pinned;
+  }
+
+  public void setPinned(Boolean pinned) {
+    this.pinned = pinned;
+  }
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -170,12 +191,13 @@ public class CompleteNote   {
         Objects.equals(this.title, completeNote.title) &&
         Objects.equals(this.content, completeNote.content) &&
         Objects.equals(this.userHash, completeNote.userHash) &&
-        Objects.equals(this.lastEdit, completeNote.lastEdit);
+        Objects.equals(this.lastEdit, completeNote.lastEdit) &&
+        Objects.equals(this.pinned, completeNote.pinned);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, content, userHash, lastEdit, initVector);
+    return Objects.hash(id, title, content, userHash, lastEdit, initVector, pinned);
   }
 
   @Override
@@ -189,6 +211,7 @@ public class CompleteNote   {
     sb.append("    content: ").append(toIndentedString(content)).append("\n");
     sb.append("    userHash: ").append(toIndentedString(userHash)).append("\n");
     sb.append("    lastEdit: ").append(toIndentedString(lastEdit)).append("\n");
+    sb.append("    pinned: ").append(toIndentedString(pinned)).append("\n");
     sb.append("}");
     return sb.toString();
   }

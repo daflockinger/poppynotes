@@ -7,6 +7,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.flockinger.poppynotes.notesService.api.RateLimitInterceptor;
+import com.flockinger.poppynotes.notesService.api.WhitelistUserInterceptor;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -16,6 +17,8 @@ public class WebConfig implements WebMvcConfigurer {
 
   @Autowired
   private RateLimitInterceptor rateLimiter;
+  @Autowired
+  private WhitelistUserInterceptor whitelistInterceptor;
 
   @Override
   public void addCorsMappings(CorsRegistry registry) {
@@ -29,5 +32,6 @@ public class WebConfig implements WebMvcConfigurer {
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(rateLimiter);
+    registry.addInterceptor(whitelistInterceptor);
   }
 }

@@ -36,4 +36,8 @@ export interface CompleteNote {
      * Unique Initialization Vector for note encryption.
      */
     initVector?: string;
+    /**
+     * Pin for important messages to be shown always on top.
+     */
+    pinned?: boolean;
 }

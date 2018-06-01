@@ -7,6 +7,7 @@ import { OverviewNote, NotesService, DEFAULT_PAGE, DEFAULT_SIZE } from 'src/app/
 import { Component, OnInit, Inject, TemplateRef } from '@angular/core';
 import * as _ from 'lodash';
 import { SecretstoreService } from 'src/app/service/crypto/secretstore.service';
+import { nullSafeIsEquivalent } from '@angular/compiler/src/output/output_ast';
 
 
 @Component({
@@ -31,6 +32,7 @@ export class CardDeckComponent implements OnInit {
       this.notes = notes;
     }, error => {
       console.log(error.message);
+      this.notes = [];
     });
   }
 
@@ -44,7 +46,11 @@ export class CardDeckComponent implements OnInit {
   }
 
   private getUserHash() {
-    return this.secretStore.getUserHash();
+    let userHash = this.secretStore.getUserHash();
+    if (userHash === null) {
+      userHash = '';
+    }
+    return userHash;
   }
 
   private calculateThisPage(): number {

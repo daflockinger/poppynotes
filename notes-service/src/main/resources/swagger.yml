@@ -317,6 +317,9 @@ definitions:
         type: string
         format: date
         description: Date the user last edited the note.
+      pinned:
+        type: boolean
+        description: Pin for important messages to be shown always on top.
   OverviewNote:
     type: object
     properties:
