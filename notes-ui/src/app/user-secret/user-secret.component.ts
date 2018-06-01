@@ -1,7 +1,7 @@
 import { NotesService } from './../service/api/notes.service';
 import { SecretstoreService } from './../service/crypto/secretstore.service';
 import { CryptoService } from './../service/crypto/crypto.service';
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, Input } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { keyframes } from '@angular/animations/src/animation_metadata';
 import { FormBuilder, FormControl, FormGroup, Validators, AbstractControl } from '@angular/forms';
@@ -21,20 +21,14 @@ export class UserSecretComponent implements OnInit {
 
   secretForm: FormGroup;
 
+  @Input('isUserAllowed')
+  isUserAllowed: boolean;
+
   keyEditModeDisabled = true;
   userKey = '';
   userHash = '';
-  userAllowed: boolean;
-  isInitFinished = false;
 
   ngOnInit() {
-    this.checkIfUserAllowed().subscribe(notes => {
-      this.userAllowed = true;
-      this.isInitFinished = true;
-    }, error => {
-      this.userAllowed = false;
-      this.isInitFinished = true;
-    });
     this.userKey = this.secretStore.getKey();
     this.userHash = this.secretStore.getUserHash();
 
@@ -66,10 +60,6 @@ export class UserSecretComponent implements OnInit {
       userHash = '';
     }
     return this.noteService.getNotes(userHash, 0, 1);
-  }
-
-  public isUserAllowed() {
-    return this.userAllowed;
   }
 
 

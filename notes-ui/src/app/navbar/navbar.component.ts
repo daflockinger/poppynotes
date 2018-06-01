@@ -39,13 +39,20 @@ export class NavbarComponent implements OnInit {
       error => {
         this.bsModalRef = this.modalService.show(UserSecretComponent, {
           backdrop: 'static',
-          ignoreBackdropClick: true
+          ignoreBackdropClick: true,
+          initialState: {
+            isUserAllowed: false
+          }
         });
     });
   }
 
   public openUserSecretModal() {
-    this.bsModalRef = this.modalService.show(UserSecretComponent);
+    this.bsModalRef = this.modalService.show(UserSecretComponent, {
+      initialState: {
+        isUserAllowed: true
+      }
+    });
   }
 
   public openNoteEditModal(template: TemplateRef<any>) {
