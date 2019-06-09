@@ -2,7 +2,7 @@ import { CryptoService } from 'src/app/service/crypto/crypto.service';
 import { Injectable, Injector } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import 'rxjs/add/operator/map';
+
 import { SecretstoreService } from 'src/app/service/crypto/secretstore.service';
 import * as _ from 'lodash';
 import { HttpResponse } from '@angular/common/http/src/response';

@@ -18,7 +18,7 @@ import {
 } from '@angular/common/http';
 import { CustomHttpUrlEncodingCodec } from '../encoder';
 import { environment } from './../../../environments/environment.prod';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 import { CompleteNote } from '../model/completeNote';
 import { CreateNote } from '../model/createNote';
