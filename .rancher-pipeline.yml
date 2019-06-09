@@ -12,6 +12,6 @@ stages:
   - publishImageConfig:
       dockerfilePath: ./notes-service/Dockerfile
       buildContext: .
-      tag: daflockinger/poppynotes-backend
+      tag: daflockinger/poppynotes-backend:${CICD_EXECUTION_SEQUENCE}
       registry: 127.0.0.1:34685
 timeout: 60
