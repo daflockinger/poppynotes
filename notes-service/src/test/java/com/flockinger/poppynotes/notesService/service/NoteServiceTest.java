@@ -3,22 +3,8 @@ package com.flockinger.poppynotes.notesService.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import java.sql.Date;
-import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+
 import com.flockinger.poppynotes.notesService.BaseDataBaseTest;
 import com.flockinger.poppynotes.notesService.config.DatabaseConfig;
 import com.flockinger.poppynotes.notesService.config.GeneralConfig;
@@ -34,10 +20,22 @@ import com.flockinger.poppynotes.notesService.exception.NoteNotFoundException;
 import com.flockinger.poppynotes.notesService.exception.NoteSizeExceededException;
 import com.flockinger.poppynotes.notesService.model.Note;
 import com.flockinger.poppynotes.notesService.service.impl.NotesServiceImpl;
+import java.sql.Date;
+import java.util.List;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 
 @ContextConfiguration(classes = {NotesServiceImpl.class, ModelMapper.class, NoteRepository.class})
 @RunWith(SpringRunner.class)
-@DataMongoTest(excludeAutoConfiguration = EmbeddedMongoAutoConfiguration.class)
+@DataMongoTest
 @Import({GeneralConfig.class, DatabaseConfig.class})
 @TestPropertySource(properties= {"notes.settings.limits.max-title-length=50",
     "notes.settings.limits.max-content-length=100",
