@@ -1,5 +1,5 @@
 import { Directive, ElementRef, Input, HostListener } from '@angular/core';
-import { AfterViewInit, AfterViewChecked } from '@angular/core/src/metadata/lifecycle_hooks';
+import { AfterViewInit, AfterViewChecked } from '@angular/core';
 
 @Directive({
   selector: 'textarea[appResizeABit]'

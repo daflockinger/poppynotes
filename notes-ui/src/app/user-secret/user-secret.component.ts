@@ -2,8 +2,8 @@ import { NotesService } from './../service/api/notes.service';
 import { SecretstoreService } from './../service/crypto/secretstore.service';
 import { CryptoService } from './../service/crypto/crypto.service';
 import { Component, OnInit, Inject, Input } from '@angular/core';
-import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
-import { keyframes } from '@angular/animations/src/animation_metadata';
+import { BsModalRef } from 'ngx-bootstrap/modal';
+import { keyframes } from '@angular/animations';
 import { FormBuilder, FormControl, FormGroup, Validators, AbstractControl } from '@angular/forms';
 
 @Component({

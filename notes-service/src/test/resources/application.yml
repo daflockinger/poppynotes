@@ -11,6 +11,8 @@ spring:
     date-format: com.flockinger.poppynotes.notesService.config.RFC3339DateFormat
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
+  main:
+    allow-bean-definition-overriding: true
 
 springfox:
   documentation:
