@@ -1,10 +1,9 @@
 import { SecretstoreService } from './../service/crypto/secretstore.service';
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, TemplateRef } from '@angular/core';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { UserSecretComponent } from 'src/app/user-secret/user-secret.component';
 import { CardEditComponent } from 'src/app/card-edit/card-edit.component';
-import { TemplateRef } from '@angular/core/src/linker/template_ref';
 import { NotesService } from 'src/app/service';
 
 @Component({

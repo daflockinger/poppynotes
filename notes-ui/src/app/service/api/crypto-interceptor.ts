@@ -1,11 +1,12 @@
 import { CryptoService } from 'src/app/service/crypto/crypto.service';
 import { Injectable, Injector } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject, asapScheduler, pipe, of, from, interval, merge, fromEvent, SubscriptionLike, PartialObserver } from 'rxjs';
+import { map, filter, scan } from 'rxjs/operators';
 
 import { SecretstoreService } from 'src/app/service/crypto/secretstore.service';
 import * as _ from 'lodash';
-import { HttpResponse } from '@angular/common/http/src/response';
+import { HttpResponse } from '@angular/common/http';
 
 @Injectable()
 export class CryptoInterceptor implements HttpInterceptor {
@@ -21,7 +22,8 @@ export class CryptoInterceptor implements HttpInterceptor {
 
     return next
       .handle(req)
-      .map((response: HttpResponse<SecretNoteBody>) => {
+      .pipe(
+      map((response: HttpResponse<SecretNoteBody>) => {
       if (response.body !== undefined && response.body != null) {
         if (Array.isArray(response.body)) {
           response.body
@@ -32,7 +34,7 @@ export class CryptoInterceptor implements HttpInterceptor {
         }
       }
       return response;
-    });
+    }));
   }
 
   private instanceofNoteBody(body: any): boolean {
