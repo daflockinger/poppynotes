@@ -1,0 +1,17 @@
+stages:
+- name: compile backend
+  steps:
+  - runScriptConfig:
+      image: maven:3.6.1-jdk-11-slim
+      shellScript: |-
+        cd notes-service
+        mvn package
+        cd ..
+- name: build container
+  steps:
+  - publishImageConfig:
+      dockerfilePath: ./notes-service/Dockerfile
+      buildContext: .
+      tag: daflockinger/poppynotes-backend
+      registry: 127.0.0.1:34685
+timeout: 60
