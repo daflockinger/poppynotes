@@ -7,10 +7,11 @@ stages:
         cd notes-service
         mvn package
         cd ..
-  - runScriptConfig:
-      image: trion/ng-cli:8.0.1
-      shellScript: |-
-        cd notes-ui
-        ng build --prod
-        cd ..
+- name: build container
+  steps:
+  - publishImageConfig:
+      dockerfilePath: ./notes-service/Dockerfile
+      buildContext: .
+      tag: daflockinger/poppynotes-backend
+      registry: 127.0.0.1:34685
 timeout: 60
