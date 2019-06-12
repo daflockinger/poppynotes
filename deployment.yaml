@@ -30,7 +30,11 @@ spec:
       imagePullSecrets:
       - name: pipeline-docker-registry
       containers:
-      - env:
+      - name: maven
+        image: ${CICD_IMAGE}:${CICD_EXECUTION_SEQUENCE}
+        ports:
+        - containerPort: 8081
+        env:
         - name: CORS_ALLOWED_ORIGIN
           value: https://notes.flockinger.com
         - name: IS_WHITELISTING_ENABLED
@@ -61,7 +65,3 @@ spec:
             secretKeyRef:
               key: password
               name: poppynotes-mongodb
-      - name: maven
-        image: ${CICD_IMAGE}:${CICD_EXECUTION_SEQUENCE}
-        ports:
-        - containerPort: 8081
