@@ -1,0 +1,36 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: poppynotes-api
+spec:
+  selector:
+    app: poppynotes-api
+  type: HostPort
+  ports:
+    - protocol: TCP
+      port: 8001
+      targetPort: 0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poppynotes-api
+  labels:
+    app: poppynotes-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: poppynotes-api
+  template:
+    metadata:
+      labels:
+        app: poppynotes-api
+    spec:
+      imagePullSecrets:
+      - name: pipeline-docker-registry
+      containers:
+      - name: maven
+        image: ${CICD_IMAGE}:${CICD_EXECUTION_SEQUENCE}
+        ports:
+        - containerPort: 8081
