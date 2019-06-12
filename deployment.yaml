@@ -5,7 +5,7 @@ metadata:
 spec:
   selector:
     app: poppynotes-api
-  type: HostPort
+  type: ClusterIP
   ports:
     - protocol: TCP
       port: 8001
