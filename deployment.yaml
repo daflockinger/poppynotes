@@ -30,6 +30,37 @@ spec:
       imagePullSecrets:
       - name: pipeline-docker-registry
       containers:
+      - env:
+        - name: CORS_ALLOWED_ORIGIN
+          value: https://notes.flockinger.com
+        - name: IS_WHITELISTING_ENABLED
+          value: "true"
+        - name: MAX_CONTENT_LENGTH
+          value: "20000"
+        - name: MAX_MESSAGES_PER_USER
+          value: "5000"
+        - name: MAX_TITLE_LENGTH
+          value: "100"
+        - name: MONGO_DB_NAME
+          value: poppynotes
+        - name: MONGO_HOST
+          value: mongodb.mongodb.svc.cluster.local
+        - name: MONGO_PORT
+          value: "27017"
+        - name: RATE_CALL_LIMIT
+          value: "20"
+        - name: RATE_LIMIT_RANGE_MIN
+          value: "1"
+        - name: MONGO_USER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: poppynotes-mongodb
+        - name: MONGO_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: poppynotes-mongodb
       - name: maven
         image: ${CICD_IMAGE}:${CICD_EXECUTION_SEQUENCE}
         ports:
