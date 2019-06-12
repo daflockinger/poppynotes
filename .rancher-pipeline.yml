@@ -14,4 +14,26 @@ stages:
       buildContext: .
       tag: daflockinger/poppynotes-backend:${CICD_EXECUTION_SEQUENCE}
       registry: 127.0.0.1:34685
+- name: deploy
+  steps:
+  - applyYamlConfig:
+      path: ./deployment.yaml
+    env:
+      CORS_ALLOWED_ORIGIN: https://notes.flockinger.com
+      IS_WHITELISTING_ENABLED: "true"
+      MAX_CONTENT_LENGTH: "20000"
+      MAX_MESSAGES_PER_USER: "5000"
+      MAX_TITLE_LENGTH: "100"
+      MONGO_DB_NAME: poppynotes
+      MONGO_HOST: mongodb.mongodb.svc.cluster.local
+      MONGO_PORT: "27017"
+      RATE_CALL_LIMIT: "20"
+      RATE_LIMIT_RANGE_MIN: "1"
+    envFrom:
+    - sourceName: poppynotes-mongodb
+      sourceKey: user
+      targetKey: MONGO_USER
+    - sourceName: poppynotes-mongodb
+      sourceKey: password
+      targetKey: MONGO_PASSWORD
 timeout: 60
