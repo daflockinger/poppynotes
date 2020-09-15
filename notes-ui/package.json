@@ -40,7 +40,7 @@
     "ngx-bootstrap": "^4.2.0",
     "ngx-moment": "^3.4.0",
     "ngx-webstorage": "^2.0.1",
-    "node-forge": "^0.7.5",
+    "node-forge": "^0.10.0",
     "rxjs": "^6.5.2",
     "zone.js": "^0.9.1"
   },
